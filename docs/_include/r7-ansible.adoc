@@ -9,11 +9,33 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-= UNIT TITLE
+= System Automation with Ansible and System-Roles
 
-Provide a unit summary here.
+Ansible is an open source automation platform that uses a simple automation language
+that describes an IT application infrastructure within Ansible Playbooks. Ansible is also
+an automation engine that runs Ansible Playbooks.
+You can utilize Ansible in many ways:
 
-== TASK 1
+  * Device configuration management
+  * Application deployment
+  * Provisioning
+  * Continuous delivery
+  * Security and compliance
+  *Orchestration
+
+`ansible` is the primary command line tool to initiate a ad hoc command.
+`ansible-playbook` is the command line tool to run Ansible Playbooks. The syntax used for configuring Ansible Playbooks is written in YAML.
+
+The Ansible Engine product channel is provided as a convenience with the Red Hat Enterprise Linux subscription as a unsupported dependency for the implementation of RHEL System Roles. However, support of Ansible Engine product by the RHEL subscription is limited to the context of, and modules used by, RHEL System Roles. A full support subscription is available for Ansible Engine and Ansible Tower which are also able to use the RHEL System Roles.
+
+== Ansible Concepts
+
+
+
+
+
+
+
 
 Some instrcutional text
 
