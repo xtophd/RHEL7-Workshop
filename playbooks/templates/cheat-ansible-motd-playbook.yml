@@ -1,0 +1,19 @@
+#!/bin/bash
+
+FILENAME="/root/roles/motd/defaults/use-motd-role.yml"
+
+echo "# Creating file ${FILENAME}'"
+
+cat > ${FILENAME} << EOF
+---
+- name: Use MOTD role playbook
+  hosts: server1.example.com
+  user: root
+  become: false
+  roles:
+  - motd
+EOF
+
+echo "# Here are the contents of ${FILENAME}"
+
+cat ${FILENAME}
