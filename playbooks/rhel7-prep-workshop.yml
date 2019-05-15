@@ -42,3 +42,5 @@
 
 
 - import_playbook: rhel7-setup-ansible.yml
+- import_playbook: rhel7-setup-systemd.yml
+
