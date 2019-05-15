@@ -130,7 +130,8 @@ Loadavg        			memory     swap      io     system    cpu
  0.02    0     1556m   764 145884    0   0   0   8   36 63  0   0   100
 ----
 
-=== Additional PCP Monitors
+[discrete]
+==== Additional PCP Monitors
 
 PCP includes other monitors to view and analyze collector data:
  
@@ -141,7 +142,7 @@ PCP includes other monitors to view and analyze collector data:
  
 NOTE: Remember that these tools can work across remote systems to analyze more complicated systems (think 3-tier applications)
 
-==== GUI Charting
+=== GUI Charting
 
 NOTE: If you are using the graphical console of the workstation VM, you should be able to run pmchart from the command line.
 
@@ -211,35 +212,50 @@ TIP: The details of the profiles can be found in the man page `man tuned-profile
 === Change the Current Tuning Profile
 
 To switch to another existing tuned profile (ex: powersave), use the tuned-adm command.
- 
+
+----
 # tuned-adm profile powersave
+----
 
 Now use tuned-adm again to verify that your system tuning profile is now set to powersave.
 
-
+----
 # tuned-adm active
+----
 
+----
 Current active profile: powersave
-Customizing a Tuning Profile
+----
+
+=== Customizing a Tuning Profile
+
 Let us say our system is running an application that works well with the virtual-guest profile but not with Transparent Hugepages (THP). Examples of workloads where THP are not optimal include: SAP HANA, DB2, Datastage, Ambari, etc.
 
-Note: Red Hat includes specific bare metal and virt profiles for SAP HANA with RHEL.
+NOTE: Red Hat includes specific bare metal and virt profiles for SAP HANA with RHEL.
  
-Begin by checking the current status of THP
+Begin by checking the current status of THP (transparent huge pages)
 
-
+----
 # cat /sys/kernel/mm/transparent_hugepage/enabled
+----
+
+----
 [always] madvise never
+----
 
 Now let us create a directory for our custom configuration and then create a config which inherits virtual-guest and then modifies THP.
 
+----
 # cd /usr/lib/tuned
+
 
 # mkdir virtual-guest-no-thp
 # cd virtual-guest-no-thp 
 
 # vim tuned.conf
- 
+----
+
+---- 
 ### add the following contents
  
 [main] 
@@ -247,54 +263,77 @@ include=virtual-guest
  
 [vm] 
 transparent_hugepages=never
+----
 
 Now save the file and load the new tuning profile.  Finally, check your work.
 
+----
 # tuned-adm profile virtual-guest-no-thp
 # tuned-adm active
+----
 
+----
 Current active profile: virtual-guest-no-thp
+----
  
+----
 # cat /sys/kernel/mm/transparent_hugepage/enabled
+----
 
+----
 always madvise [never]
+----
  
 By looking at other tuned.conf files in /usr/lib/tuned, you will notice that other profile's tuned.conf contains a [sysctl] section. It is common practice to place sysctl tunings in /etc/sysctl.conf so they are set on boot, however tuned provides a mechanism for maintaining these types of tunables as well as others like disk scheduling and power settings for workload profiles.
-Disabling Tuned
+
+=== Disabling Tuned
+
 tuned is simple to disable if you choose not to run it.
- 
+
+----
 # tuned-adm off 
-# tuned-adm active 
+# tuned-adm active
+----
+
+----
 No current active profile.
- 
+----
+
+----
 # systemctl stop tuned.service
 # systemctl disable tuned.service
-Optimizing NUMA
+----
+
+== Optimizing NUMA
  
 Historically, NUMA has been one of the most important items to tune and account for on larger systems. The RHEL 7 kernel implements automatic NUMA balancing for hardware with NUMA properties. Both following conditions are required:
  
-numactl: hardware shows multiple nodes
-NUMA flags: NUMA options can be set in /sys/kernel/debug/sched_features
+  * numactl: hardware shows multiple nodes
+  * NUMA flags: NUMA options can be set in /sys/kernel/debug/sched_features
  
 This is the first release of RHEL where, out of the box, NUMA will require little to no tuning considerations for most workloads. The kernel is NUMA aware and in most cases will simply “do the right thing”. That said, there are still edge cases where certain workloads will perform better with manual pinning (numctl) or from running numad.
  
-Getting Started
+=== Getting Started
  
 Red Hat introduced numad (an automatic NUMA affinity management daemon) in RHEL 6.3. It is a userspace tool that aims to improve out-of-the-box NUMA system performance for any long running, significant resource consuming processes (ex: KVM processes, HPC applications, etc…). It is not likely to help with processes that run only a few minutes, don't do much processing or don’t use much memory.
  
 By default, numad is not installed on a RHEL 7 host. The following steps will walk you through installing and enabling numad on Red Hat Enterprise Linux 7.
 
+----
 # yum install numad numactl
 
 # systemctl enable numad.service
 # systemctl start numad.service
 # systemctl status numad.service
+----
 
+`numactl` lets administrators run a process with a specified scheduling or memory placement policy.  It can also set a persistent policy for shared memory segments or files, and set the processor affinity and memory affinity of a process.  Granted this is not too exciting on our small lab VM, but let's look at the current resources on your VM using `numactl`:
 
-
-numactl lets administrators run a process with a specified scheduling or memory placement policy.  It can also set a persistent policy for shared memory segments or files, and set the processor affinity and memory affinity of a process.  Granted this is not too exciting on our small lab VM, but let's look at the current resources on your VM using numactl:
-
+----
 # numactl --hardware 
+----
+
+----
 available: 1 nodes (0)
 node 0 cpus: 0 1
 node 0 size: 4095 MB
@@ -302,10 +341,15 @@ node 0 free: 2294 MB
 node distances:
 node   0
   0:  10
+----
 
 Now run lscpu to gather CPU architecture information from sysfs and /proc/cpuinfo 
 
+----
 # lscpu
+----
+
+----
 Architecture:      	x86_64
 CPU op-mode(s):    	32-bit, 64-bit
 Byte Order:        	Little Endian
@@ -328,18 +372,20 @@ L1d cache:         	32K
 L1i cache:         	32K
 L2 cache:          	4096K
 NUMA node0 CPU(s): 	0,1
+----
 
 Let's interpret the output from the previous commands.  Based on the lscpu output, it shows that this VM has 1 NUMA node, 2 CPU sockets, and 2 CPU cores. numactl is also reporting that our single NUMA node host has total of 4095 MB of memory with 2294 MB free currently.
 
-Note: Your output may differ due the the lab environment
+NOTE: Your output may differ due the the lab environment
 
+[discrete]
+==== Sample numactl Output From A Larger Host
 
-Sample numactl Output From A Larger Host
 In a multi-CPU server environment, numactl is able to display additional information about the CPU placements on the motherboard. Here is the numactl output of a multi-CPU server: 
 
+NOTE: this output comes from a different physical host and provided as an example.
 
-Note: this output comes from a different physical host and provided as an example.
-
+----
 # numactl --hardware 
 available: 4 nodes (0-3) 
 node 0 cpus: 0 4 8 12 16 20 24 28 32 36 node 0 size: 65415 MB 
@@ -361,16 +407,16 @@ node	0	1	2	3
 1:  21  10  21  21 
 2:  21  21  10  21
 3:  21  21  21  10
+----
 
+[discrete]
+==== Sample lscpu Output From A Larger Host
 
-
-
-
-Sample lscpu Output From A Larger Host
 Here is lscpu output of a multi-CPU server
 
 Note: this output comes from a different physical host and provided as an example.
 
+----
 # lscpu 
 Architecture:	x86_64
 CPU op-mode(s):	32-bit, 64-bit
@@ -397,13 +443,19 @@ NUMA node0 CPU(s):	0,4,8,12,16,20,24,28,32,36
 NUMA node1 CPU(s):	2,6,10,14,18,22,26,30,34,38
 NUMA node2 CPU(s):	1,5,9,13,17,21,25,29,33,37
 NUMA node3 CPU(s):	3,7,11,15,19,23,27,31,35,39
+----
 
 Based on previous outputs of our larger host, numactl is able to display current free and total memory that is local to each NUMA node. Also the relative distance between 2 CPU sockets on the motherboard. Based on node distance information from 'numactl --hardware', we know that any given CPU has direct connection to another CPU. CPU 0's distance to CPU 0 is 10 (the shortest), to CPU 1 is 21, to CPU 2 is 21 and to CPU 3 is 21. (i.e. same distance from CPU 0 to CPU 1, 2, and 3) 
-
-NUMA Statistics
+
+=== NUMA Statistics
+
 The numastat tool displays per-NUMA node memory statistics for processes and the operating system.  It shows administrators whether process memory is spread throughout a system or centralized on specific nodes.
 
+----
 # numastat -v	
+----
+
+----
 Per-node numastat info (in Mbs):		
                  Node 0          Total
 	           --------------- ---------------
@@ -413,33 +465,32 @@ Numa_Foreign    0.00             0.00
 Interleave_Hit  46.96            46.96
 Local_Node      11718.43         11718.43
 Other_Node      0.00             0.00
+----
 
-To find a description of each value displayed above or other numastat options, review the man page for numastat. 
-
-# man numastat 
+TIP: To find a description of each value displayed above or other numastat options, review the man page with `man numastat` 
 
 Most importantly to look out for are: numa_miss, numa_foreign and other_node values. A high value indicates a process has attempted to get a page from its local NUMA node, but it was out of free pages and the system had to allocate free pages from another NUMA node.
 
-
+
 Below is an example of a RHEL 6 hypervisor running without numad. Notice the VMs are split almost evenly across the sockets.
-
-
-
 
 Next is the same hardware running numad. Notice the NUMA alignment is almost perfect and the Numa_Miss count dropped from ~2300 to ~7.
 
+=== Disable/Enable NUMA Balancing 
 
-
-
-Enable and Disable NUMA Balancing
-Disable To disable/enable system-wide automatic NUMA balancing, use the following commands
+To disable/enable system-wide automatic NUMA balancing, use the following commands
 
 To disable NUMA balancing:
-# echo 0 > /proc/sys/kernel/numa_balancing
 
+----
+# echo 0 > /proc/sys/kernel/numa_balancing
+----
 
 To enable NUMA balancing:
+
+----
 # echo 1 > /proc/sys/kernel/numa_balancing
+----
 
 
 
