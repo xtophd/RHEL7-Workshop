@@ -37,7 +37,7 @@
         group: root
         mode: 0600
       with_items:
-        - {src: 'sudoers.j2', dest: '/etc/sudoers.d/student'}
+        - {src: 'sudoers.j2', dest: '/etc/sudoers.d/rhel7-workshop'}
 
 
 
