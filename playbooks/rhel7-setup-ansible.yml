@@ -4,7 +4,7 @@
   unit_euid: student
   tasks:
 
-    - name: "SETUP ANSIBLE: yum ansible rhel-system-roles "
+    - name: "SETUP ANSIBLE: install packages"
       yum: name=ansible,rhel-system-roles state=installed
 
     - name: "SETUP ANSIBLE: cheat script installs"
