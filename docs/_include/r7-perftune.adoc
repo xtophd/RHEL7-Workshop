@@ -8,6 +8,9 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+:toc:
+:toclevels: 1
+
 = Performance Analysis and Tuning
 
 There are many tools provided in RHEL 7 to help optimize and monitor performance. In this section, we are going to take a look at:
