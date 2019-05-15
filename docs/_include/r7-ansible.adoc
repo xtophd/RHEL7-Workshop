@@ -83,6 +83,145 @@ Ansible Roles documentation is located in: `/usr/share/ansible/roles/rhel-system
 
 Now that we have installed Ansible and RHEL System Roles and a general understanding of what Ansible is, let’s create and modify the initial configuration file to run a few modules against our managed hosts using our _inventory_ file.
 
+=== Create Ansible Configuration
+
+Run the following to create you ansible configuration file.
+
+.[root@workstation]#
+----
+cheat-ansible-config.sh
+----
+
+=== Create Ansible Inventory
+
+Run the following command to create your _inventory_ file.
+
+.[root@workstation]#
+----
+cheat-ansible-inventory.sh
+----
+
+=== Ansible AdHoc: ping
+
+.[root@workstation]#
+----
+ansible servers -m ping
+----
+
+.Command Output
+[source,indent=4]
+----
+server2.example.com | SUCCESS => {
+"changed": false,
+"ping": "pong"
+}
+server1.example.com | SUCCESS => {
+"changed": false,
+"ping": "pong"
+}
+----
+
+=== Ansible AdHoc: setup
+
+.[root@workstation]#
+----
+ansible -m setup -a ‘filter=ansible_eth0’ server1.example.com
+----
+
+.Command Output
+[source,indent=4]
+----
+..<SNIP>..
+server1.example.com | SUCCESS => {
+  "ansible_facts": {
+    "ansible_eth0": {
+      "active": true,
+      "device": "eth0",
+      "features": {
+        "busy_poll": "off [fixed]",
+        "fcoe_mtu": "off [fixed]",
+..<SNIP>..
+"ipv4": {
+  "address": "10.0.0.11",
+  "broadcast": "10.0.0.255",
+  "netmask": "255.255.255.0",
+  "network": "10.0.0.0"
+  },
+"ipv6": [
+  {
+    "address": "fe80::2ec2:60ff:fe02:d1d5",
+    "prefix": "64",
+    "scope": "link"
+  }
+----
+
+== Ansible Playbook wth Roles
+
+Let’s now define the role content for use with Ansible Playbooks that introduces RHEL System Roles. In this case we’ll create a role called “motd”.
+
+First, create the directory structure for the “motd” role:
+
+.[root@workstation]#
+----
+cd /root
+mkdir roles
+cd roles
+ansible-galaxy init motd
+----
+
+Second, create a jinja template file.
+
+.[root@workstation]#
+----
+cheat-ansible-motd-template.sh
+----
+
+Now modify the main.yml to define a variable
+
+.[root@workstation]#
+----
+cheat-ansible-motd-main.sh
+----
+
+And finally, adjust the playbook to call our new `motd` role.
+
+.[root@workstation]#
+----
+cheat-ansible-playbook.sh
+----
+
+Now run the playbook with our cutom `motd` role.
+
+.[root@workstation]#
+----
+ansible-playbook use-motd-role.yml
+----
+
+.Command Output
+[source,indent=4]
+----
+PLAY [Use MOTD role playbook]
+*****************************************************************
+TASK [Gathering Facts]
+*****************************************************************
+ok: [server1.example.com]
+TASK [motd : Deliver MOTD file]
+*****************************************************************
+changed: [server1.example.com]
+PLAY RECAP
+*****************************************************************
+server1.example.com : ok=2 changed=1 unreachable=0
+failed=0
+----
+
+When the playbook was executed the tasks continued to perform because the role itself
+can be identified by the roles configuration within the playbook.
+
+=== Validation
+
+
+
+
 == Additional Resources
 
 Red Hat Documentation
