@@ -9,6 +9,9 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+:toc:
+:toclevels: 1
+
 = System Automation with Ansible and System-Roles
 
 Ansible is an open source automation platform that uses a simple automation language
