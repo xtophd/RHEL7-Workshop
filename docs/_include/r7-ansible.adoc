@@ -228,7 +228,7 @@ ssh root@server1.example.com
 
 .Command Output
 [source,indent=4]
----
+----
 This is the system server1.example.com.
 Today's date is: 2018-05-04.
 Only use this system with permission.
