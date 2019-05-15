@@ -12,6 +12,9 @@ ifdef::env-github[]
 endif::[]
 :imagesdir: ./_include/_images/
 
+:toc:
+:toclevels: 1
+
 = RHEL7 Workshop
 
 [discrete]
