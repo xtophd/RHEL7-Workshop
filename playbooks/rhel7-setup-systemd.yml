@@ -4,8 +4,11 @@
   unit_euid: student
   tasks:
 
-    - name: "SETUP SYSTEMD: yum ansible rhel-system-roles "
-      yum: name=ansible,rhel-system-roles state=installed
+    - name: "SETUP SYSTEMD: install packages"
+      yum: name=httpd,mariadb,mariadb-server,php,php-mysql state=installed
+
+    - name: "SETUP SYSTEMD: system service settings"
+      yum: name=httpd,mariadb state=stopped enabled=no
 
     - name: "SETUP SYSTEMD: cheat script installs"
       template:
