@@ -27,8 +27,8 @@ Performance Co-Pilot (PCP) is a suite of tools, services and libraries for acqui
  
 PCP is broken down into two primary components:
  
-  * *PCP Collectors*: These are the parts of PCP that collect and extract performance data from various sources, e.g. the operating system kernel.
-  * *PCP Monitors*:  These are the parts of PCP that display data collected from hosts (or archives) that have the PCP Collector installed. Many monitor tools are available as part of the core PCP release, while other (typically graphical) monitoring tools are available separately in the PCP GUI package.
+  * PCP Collectors: These are the parts of PCP that collect and extract performance data from various sources, e.g. the operating system kernel.
+  * PCP Monitors:  These are the parts of PCP that display data collected from hosts (or archives) that have the PCP Collector installed. Many monitor tools are available as part of the core PCP release, while other (typically graphical) monitoring tools are available separately in the PCP GUI package.
 
 
 === Getting Started
