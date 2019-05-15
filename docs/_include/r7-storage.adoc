@@ -1,0 +1,355 @@
+:sectnums:
+:sectnumlevels: 3
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+:toc:
+:toclevels: 1
+
+= Storage Management: lvm, ssm, vdo
+
+
+== LOGICAL VOLUME MANAGER (LVM)
+
+With the introduction of RHEL 7, two new storage management interfaces are available:
+
+  * System Storage Manager (SSM)
+  * libStorageMgmt
+
+System Storage Manager (ssm) is a new command line interface for consolidated storage operations which integrates logical volume management, device mapper (DM), multiple-device (MD) and file-system operations into one unified user interface.
+
+The libStorageMgmt package is a storage array independent Application Programming Interface (API).  It provides a stable and consistent API that allows developers the ability to programmatically manage different storage arrays and leverage the hardware accelerated features provided.  This library is used as a building block for other higher level management tools and applications.  End system administrators can also use it as a tool to manually manage storage and automate storage management tasks with the use of scripts. 		
+
+With the release of RHEL 7.5, Red Hat added new technology into storage stack allowing for compression and deduplication.  The technology came by way of the acquisition of a company called Permabit and it is called the Virtual Data Optimizer... or VDO.
+
+== System Storage Manager (SSM)
+
+Traditional manual steps to construct a working file-system from the ground up went like this:
+
+  * Partition a block device (fdisk or parted)
+  * Create a physical volume (pvcreate)
+  * Create a logical volume group (vgcreate)
+  * Create a logical volume (lvcreate)
+  * Create a filesystem (mkfs)
+  * Mount the filesystem (mount)
+  * Create entry in /etc/fstab for persistence
+
+With SSM, the workflow is as follows:
+
+  * Partition a block device (fdisk or parted)
+  * Create pv, vg, lv, filesystem and mount (ssm)
+  * Add entry in /etc/fstab for persistence
+
+=== Getting Started
+
+First, we need to install system-storage-manager utility.
+
+----
+# yum install -y system-storage-manager
+----
+
+Notice that there are NO physical storage devices. We are using files mapped as block devices via device-mapper.
+Create a Simple Filesystem
+
+----
+# ssm list devices
+----
+
+----
+------------------------------------------------------------------
+Device         Free     Used      Total  Pool          Mount point
+------------------------------------------------------------------
+/dev/fd0                        4.00 KB                           
+/dev/vda                       10.00 GB                PARTITIONED
+/dev/vda1                     500.00 MB                /boot      
+/dev/vda2   0.00 KB  9.51 GB    9.51 GB  rhel_pwob-r7             
+/dev/vdb                       20.00 GB                           
+/dev/vdb1                       1.00 KB                           
+/dev/vdb10                      1.00 GB                           
+/dev/vdb11                     10.00 GB                           
+/dev/vdb5                       1.00 GB                           
+/dev/vdb6                       1.00 GB                           
+/dev/vdb7                       1.00 GB                           
+/dev/vdb8                       1.00 GB                           
+/dev/vdb9                       1.00 GB                           
+------------------------------------------------------------------
+----
+
+WARNING: If you don't see vdb5-vdb11, then stop and rerun the ansible playbook as described at the top of this lab.
+
+----
+# ssm list volumes
+----
+
+-------------------------------------------------------------------------------------------
+Volume                  Pool          Volume size  FS     FS size       Free  Type    Mount point
+-------------------------------------------------------------------------------------------
+/dev/rhel_pwob-r7/swap  rhel_pwob-r7      1.00 GB                             linear
+/dev/rhel_pwob-r7/root  rhel_pwob-r7      8.51 GB  xfs    8.50 GB    2.72 GB  linear  /
+/dev/vda1                               500.00 MB  xfs  496.67 MB  284.79 MB  part    /boot
+-------------------------------------------------------------------------------------------
+
+=== Traditional filesystem
+Creation
+
+# ssm -f create --fstype ext4 /dev/vdb5 /mnt/exercise1
+
+
+  Physical volume "/dev/vdb5" successfully created.
+  Volume group "lvm_pool" successfully created
+  Logical volume "lvol001" created.
+mke2fs 1.42.9 (28-Dec-2013)
+Filesystem label=
+OS type: Linux
+Block size=4096 (log=2)
+Fragment size=4096 (log=2)
+Stride=0 blocks, Stripe width=0 blocks
+65280 inodes, 261120 blocks
+13056 blocks (5.00%) reserved for the super user
+First data block=0
+Maximum filesystem blocks=268435456
+8 block groups
+32768 blocks per group, 32768 fragments per group
+8160 inodes per group
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (4096 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+Directory '/mnt/exercise1' does not exist! Create (Y/n/q) ? Y
+
+# df /mnt/exercise1
+
+Filesystem                   1K-blocks  Used Available Use% Mounted on
+/dev/mapper/lvm_pool-lvol001   1011672  2564    940500   1% /mnt/exercise1
+
+Removal and Cleanup
+
+# ssm -f remove /mnt/exercise1 lvm_pool
+
+Device '/dev/lvm_pool/lvol001' is mounted on '/mnt/exercise1' Unmount (N/y/q) ? Y
+  Logical volume "lvol001" successfully removed
+  Volume group "lvm_pool" successfully removed
+
+# pvremove /dev/vdb5
+
+Labels on physical volume "/dev/vdb5" successfully wiped
+RAID filesystems
+Creating RAID-1 (Mirrored) Filesystem
+# ssm -f create \			
+	--fstype ext4 \			
+	--size 500M \			
+	-p summitvg \			
+	-n exercise2 \			
+	-r 1 \				
+	/dev/vdb{6,7} /mnt/exercise2
+
+
+Physical volume "/dev/mapper/loop1p1" successfully created	
+Physical volume "/dev/mapper/loop2p1" successfully created	
+Volume group "summitvg" successfully created			
+Rounding up size to full physical extent 52.00 MiB		
+Logical volume "exercise2" created.				
+meta-data=/dev/summitvg/exercise2 isize=256	agcount=2, agsize=6656 blks
+	=		sectsz=512	attr=2, projid32bit=1
+	=		crc=0		finobt=0		
+data	=		bsize=4096	blocks=13312, imaxpct=25
+	=		sunit=0	swidth=0 blks	
+naming	=version 2		bsize=4096	ascii-ci=0 ftype=0	
+log	=internal log	bsize=4096	blocks=853, version=2
+	=		sectsz=512	sunit=0 blks, lazy-count=1
+realtime =none		extsz=4096	blocks=0, rtextents=0
+
+
+
+# df -Th /mnt/exercise2
+
+
+Filesystem                     Type  Size  Used Avail Use% Mounted on
+/dev/mapper/summitvg-exercise2 ext4  477M  2.3M  445M   1% /mnt/exercise2
+
+The additional parameter "-o" allows us to specify fields to add or remove to the output.  By using "+" or "-" in front of individual fields, you can add or remove those fields to the standard output.  In the following case, we are removing the "mirror log" and "pv move" columns to accommodate an output that fits this documents width.
+
+# lvs -o-mirror_log,move_pv summitvg				
+
+
+LV        VG       Attr       LSize   Pool Origin Data%  Meta%  Cpy%Sync Convert
+exercise2 summitvg rwi-aor--- 500.00m                           100.00
+
+Creating RAID-10 (Mirrored and Striped) Filesystem
+# ssm list volumes
+
+------------------------------------------------------------------------------------
+Volume                   Volume size  FS      FS size       Free  Type    Mount point   
+------------------------------------------------------------------------------------
+/dev/rhel_pwob-r7/swap   1.00 GB                              linear                
+/dev/rhel_pwob-r7/root   8.51 GB  xfs     8.50 GB    2.63 GB  linear  /             
+/dev/summitvg/exercise2  500.00 MB  ext4  500.00 MB  448.94 MB  raid1   /mnt/exercise2
+/dev/vda1                500.00 MB  xfs   496.67 MB  284.79 MB  part    /boot         
+------------------------------------------------------------------------------------
+
+
+# ssm -f create \			
+	--size 500M \			
+	--fstype xfs \			
+	--pool summitvg \		
+	--name exercise3 \		
+	--raid 10 \
+/dev/vdb{7..10} /mnt/exercise3
+
+Physical	volume "/dev/mapper/loop3p1" successfully created	
+Physical	volume "/dev/mapper/loop4p1" successfully created	
+Physical	volume "/dev/mapper/loop5p1" successfully created	
+Physical	volume "/dev/mapper/loop6p1" successfully created	
+Volume group "summitvg" successfully extended		
+Rounding	size (25 extents) up to stripe boundary size (26 extents).
+Logical volume "exercise3" created.				
+meta-data=/dev/summitvg/exercise3 isize=256	agcount=4, agsize=6640 blks
+	=			sectsz=512	attr=2, projid32bit=1
+	=			crc=0		finobt=0		
+data	=			bsize=4096	blocks=26560, imaxpct=25
+	=			sunit=16	swidth=64 blks	
+naming	=version 2		bsize=4096	ascii-ci=0 ftype=0	
+log	=internal log	bsize=4096	blocks=768, version=2
+	=			sectsz=512	sunit=16 blks, lazy-count=1
+realtime =none		extsz=4096	blocks=0, rtextents=0
+
+
+# df /mnt/exercise3			
+
+
+Filesystem			Type 1K-blocks	Used Available Use% Mounted on
+/dev/mapper/summitvg-exercise3 xfs	103168	5472	97696	6% /mnt/exercise3
+
+# lvs summitvg
+
+
+LV		VG	Attr	LSize	Pool Origin Data%  Meta%	Move Log Cpy%Sync Convert
+exercise2 summitvg rwi-aor---	52.00m		100.00
+exercise3 summitvg rwi-aor--- 104.00m		100.00
+
+
+# lvs -o +segtype summitvg
+
+
+LV	VG	Attr	LSize	Pool Origin Data%	Meta%  Move Log Cpy%Sync Convert Type
+exercise2 summitvg rwi-aor---	52.00m	100.00	raid1
+exercise3 summitvg rwi-aor--- 104.00m	100.00	raid10
+
+Virtual Data Optimizer (VDO)
+First, we need to ensure the vdo and kmod-kvdo packages are installed.
+
+# yum install kmod-kvdo vdo
+
+Notice the the packages were already installed and you are ready to create your optimized filesystems.
+
+Again, recall that there are NO physical storage devices involved in this exercise. We are using files mapped as block devices via device-mapper.  You would NOT do this in a real world scenario.
+
+The workflow will resemble the traditional manual approach with one extra step
+Partition a block device (fdisk or parted)
+Configure VDO
+Create a filesystem (mkfs)
+Mount the filesystem (mount)
+Create entry in /etc/fstab for persistence
+Create an Optimized Filesystem
+There is a second disk (/dev/vdb) which we will be using for this exercise.  The disk has already be partitioned, so we will begin by creating the physical volume, the logical volume group and finally the logical volume.
+
+# vdo create 	--name=exercise4 \
+--device=/dev/vdb11 \
+--vdoLogicalSize=30G
+
+# mkfs.xfs -K /dev/mapper/exercise4
+# mkdir /mnt/exercise4
+# mount /dev/mapper/exercise4 /mnt/exercise4
+
+To make the mount persistent across reboots, you need to either add a systemd unit to mount the filesystem, or add an entry to /etc/fstab as follows:
+
+/dev/mapper/vdo_name /mnt/vdo_name xfs defaults,x-systemd.requires=vdo.service 0 0
+
+
+
+
+# vdostats --human-readable
+
+# vdostats --verbose
+
+Let us now populate the filesystem with some content.  Create a bunch of random subdirectories in our new filesystems with the following command.
+
+# for i in {1..500} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
+
+Now we will copy this lab manual into each folder as follows
+
+# for i in /mnt/exercise4/* ; do cp -v ~/RHEL7lab2018/*.pdf $i ; done
+
+
+A few additional high-level things to know about VDO.  
+
+First, the VDO systemd unit is installed and enabled by default when the vdo package is installed. This unit automatically runs the vdo start --all command at system startup to bring up all activated VDO volumes
+
+Second, VDO uses a high-performance deduplication index called UDS to detect duplicate blocks of data as they are being stored. The deduplication window is the number of previously written blocks which the index remembers. The size of the deduplication window is configurable.  The index will require a specific amount of RAM and a specific amount of disk space.
+
+Last, Red Hat generally recommends using a "sparse" UDS index for all production use cases. This indexing data structure requires approximately one-tenth of a byte of DRAM (memory) per block in its deduplication window. On disk, it requires approximately 72 bytes of disk space per block.
+
+The default configuration of the index is to use a "dense" index. This index is considerably less efficient (by a factor of 10) in DRAM, but it has much lower (also by a factor of 10) minimum required disk space, making it more convenient for evaluation in constrained environments.
+
+Please refer to the Red Hat Storage Administration Guide further information on provisioning and managing your data with VDO:
+
+Red Hat Enterprise Linux Storage Administration Guide (VDO)
+
+
+
+
+
+
+
+
+
+
+
+
+
+Provide a unit summary here.
+
+== TASK 1
+
+Some instrcutional text
+
+.[root@workstation]#
+----
+ssh node1.example.com
+----
+
+Describe the expected output if necessary
+
+.Command Output
+[source,indent=4]
+----
+Output from previous command
+----
+
+== TASK 2
+
+== TASK 3
+
+== Additional Resources
+
+Red Hat Documentation
+
+    * link:https://https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8-beta/html/installing_identity_management_and_access_control/deploying-session-recording[Deplying Session Recording on Red Hat Enterprise Linux]
+
+[discrete]
+== End of Unit
+
+link:../RHEL7-Workshop.adoc#toc[Return to TOC]
+
+////
+Always end files with a blank line to avoid include problems.
+////
