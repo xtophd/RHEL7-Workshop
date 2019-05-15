@@ -219,8 +219,21 @@ can be identified by the roles configuration within the playbook.
 
 === Validation
 
+As the user `root`, ssh to `server1.example.com` and verify that the _message of the day_ and been modified to our new standard.
 
+.[root@workstation]#
+----
+ssh root@server1.example.com
+----
 
+.Command Output
+[source,indent=4]
+---
+This is the system server1.example.com.
+Today's date is: 2018-05-04.
+Only use this system with permission.
+You can ask root@workstation.example.com for access.
+----
 
 == Additional Resources
 
