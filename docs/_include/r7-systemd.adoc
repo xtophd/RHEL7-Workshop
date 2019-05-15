@@ -10,6 +10,221 @@ endif::[]
 
 = UNIT TITLE
 
+Introduction to systemd
+systemd is the “init” system in RHEL 7 and replaces Upstart (the SysV “init” system used in prior releases of RHEL).  systemd is more than a facility to bring up user space, it is a system manager that offers: 
+
+
+service parallelization, 
+socket and D-Bus activation, 
+on-demand starting of services, 
+tracks services and child processes via cgroups, 
+and much more.
+
+systemctl is the primary command line tool for interacting with systemd. Although the service and chkconfig commands still function, it is highly recommended to use systemctl to take full advantage of systemd’s capabilities.
+Getting started
+Log into the workstation as root, and collect some data about the boot process.
+
+# systemd-analyze
+
+Startup finished in 329ms (kernel) + 619ms (initrd) + 2.816s (userspace) = 3.766s 
+
+# systemd-analyze blame
+
+631ms kdump.service
+605ms firewalld.service
+478ms postfix.service
+…<output truncated>...
+
+To streamline the boot process for something like a cloud image, we can easily learn the “cost” of some of the default services.  Using standard disk partitions (not LVM) and disabling services like postfix, kdump, and rsyslog will easily get the boot process to complete in under two seconds.
+
+Note: Doing this would probably be a bad idea for a traditional production server where services like kernel crash dumps and logging may be important.
+
+Core Concepts
+Units
+The fundamental building block that systemd manages is called a "unit".  A "unit" can describe different types of objects, but the most common type is a "service".  
+
+A "unit file" is the configuration file that describes a unit and tells systemd what dependencies exist and how to start, stop and monitor the object.
+
+"unit files" are stored in 2 different directories.  One location is reserved for the default configurations as shipped by Red Hat and the other is for customization by the local administrators.
+
+Red Hat unit files:	/usr/lib/systemd/system/...
+Customizations:	/etc/systemd/system/...
+Targets
+systemd has a concept similar to SysV init runlevels, called targets.  systemd will boot to the “default target” which can be configured using the systemctl set-default command.  Some common targets and their equivalent SysV runlevels are:
+
+multi-user.target == runlevel 3
+graphical.target == runlevel 5
+
+
+Let's view the current default target.
+
+# systemctl get-default
+graphical.target
+
+Services
+As mentioned above, systemd has another concept called a service.  A service is a type of unit which defines the traditional daemon or process.  Now let us look at what services are running on the system. 
+
+# systemctl -t service
+
+UNIT              LOAD   ACTIVE SUB     DESCRIPTION
+abrt-ccpp.service loaded active exited  Install ABRT coredump hook
+abrt-oops.service loaded active running ABRT kernel log watcher
+...<output truncated>...
+
+
+Next let's view all of the services available (ie: everything installed, running or not) on the system. The following command is similar to the older chkconfig --list as it will show both enabled and disabled services.
+
+# systemctl list-unit-files -t service
+
+UNIT FILE						STATE   
+abrt-ccpp.service                       	enabled
+abrt-oops.service                       	enabled
+...<output truncated>...
+arp-ethers.service                      	disabled
+atd.service                             	enabledls
+auditd.service                          	enabled
+autovt@.service                         	disabled
+bluetooth.service                       	enabled
+...<output truncated>...
+
+
+The state will  be enabled, disabled, static, or masked.  Static indicates that the unit file does not contain an "install" section used to enable the unit.  In this case, the unit typically performs a one-off action or is used as a dependency of another unit and should not be run by itself.
+
+Examples
+Installing a LAMP stack
+Now that we have a good idea of what’s installed on our system, let’s get a basic lamp stack up and running. 
+
+Log into the workstation as root, install the necessary packages and start the services
+
+Install the following packages:  httpd, mariadb-server, mariadb, php, php-mysql
+
+# yum install -y httpd mariadb-server mariadb php php-mysql
+
+
+Enable these services to start on boot:  httpd mariadb
+
+systemctl allows us to “glob” units, so enable httpd and mariadb in a single command.
+
+# systemctl enable httpd mariadb
+
+ln -s '/usr/lib/systemd/system/httpd.service' '/etc/systemd/system/multi-user.target.wants/httpd.service'
+ln -s '/usr/lib/systemd/system/mariadb.service' '/etc/systemd/system/multi-user.target.wants/mariadb.service'
+
+
+Start the services
+
+# systemctl start httpd mariadb
+
+
+View the status.
+
+# systemctl status httpd mariadb
+
+httpd.service - The Apache HTTP Server
+   Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled)
+   Active: active (running) since Tue 2016-05-31 21:26:35 EDT; 5s ago
+  Process: 28102 ExecStop=/bin/kill -WINCH ${MAINPID}
+(code=exited, status=0/SUCCESS)
+ Main PID: 28124 (httpd)
+...<output truncated>...
+
+Take a moment to review the output of these commands.
+Customizing Unit Files
+systemd controls more than daemons or services. For this lab, we will primarily be working with service units but it's important to know that systemd is handling the dependencies between other types: sockets, timers, mounts, swap, slices, etc.
+Unit files that ship with the RHEL are stored under /usr/lib/systemd/system. 
+
+Custom unit files, changes or extensions are stored under /etc/systemd/system 
+(or /run/systemd/system for runtime changes that won't persist).
+
+While the defaults for unit files won’t need to be altered most of the time, there will be circumstances where changing the defaults is quite beneficial. These could include hardware or software watchdog monitoring, tunings, resource management, or many other reasons.
+
+1. Create a drop-in configuration file to extend the default httpd.service unit.
+
+# mkdir /etc/systemd/system/httpd.service.d 
+# cd /etc/systemd/system/httpd.service.d 
+# vim 50-httpd.conf
+
+### add the following to the config file
+
+[Service]
+Restart=always
+CPUShares=2048
+OOMScoreAdjust=-1000
+
+
+2. Save the config file, exit the editor, and notify systemd of the changes:
+
+# systemctl daemon-reload
+# systemctl status httpd
+
+httpd.service - The Apache HTTP Server
+   Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled; vendor preset: disabled)
+  Drop-In: /etc/systemd/system/httpd.service.d
+       	└─50-httpd.conf
+...output truncated...
+
+Notice that systemctl status displays that the unit has been extended with a drop-in file.
+
+OOMScoreAdjust is use by the Out Of Memory killer and is an  integer between -1000 (to disable OOM killing for this process) and 1000 (to make killing of this process under memory pressure very likely).  
+
+Using what you learned in the last step, extend the mariadb.service unit with Restart=always. Verify that systemd recognizes the settings and test the policy using killall mysqld.
+CGroup Resource Management
+systemd will setup a single root cgroup hierarchy under /sys/fs/cgroup/systemd and use cgroups to track services and their child processes. We need to understand the following unit types:
+
+Slice: A unit used to build the cgroup hierarchy. This is essentially how the system is “carved up.”
+Scope: A transient, organizational unit that groups processes that have registered with systemd. User sessions, VMs, and containers are exposed as scopes for resource management.
+Service: A daemon or group of process that systemd controls and monitors.
+
+By default, the system will have two slices: system and user.
+
+
+The system.slice is the default location for service units. The services that ship with RHEL (ie: httpd and mariadb) will be located in this slice by default.
+
+The user.slice contains all user sessions and processes. 
+
+Also, a machine.slice will be created when VMs and containers are started.
+
+Each of these slices are directly under the root slice and get equal scheduler time while the system is under contention. The default configuration prevents processes from any slice from monopolizing the entire system. It also goes a step further and prevents the same thing within each slice and scope. Previously, scheduling time was done per thread, and services with a disproportionate number of threads/processes received a disproportionate amount of CPU time.
+
+By default, slices, scopes, and services default to CPUShares=1024. This will work perfectly for most workloads out of the box. 
+
+Note: The VM Infrastructure in this lab may have different values than 1024. All further commands should still work correctly. 
+
+View the default cgroup hierarchy on our workstation.
+
+# systemd-cgls
+
+├─1 /usr/lib/systemd/systemd --switched-root --system --deserialize 23 ├─user.slice
+└─user-0.slice
+├─session-2.scope
+│ ├─2045 sshd: root@pts/1
+│ └─2049 -bash
+└─session-1.scope
+├─2009 sshd: root@pts/0
+├─2013 -bash
+├─2132 systemd-cgls
+└─2133 less
+└─system.slice
+├─polkit.service
+......................
+
+Raising or lowering the CPUShares for a service will control the relative amount of CPU time. It works much like nice values, but a lot better. 
+
+Double the default value of CPUShares and verify the change:
+
+# systemctl set-property httpd CPUShares=2048 
+# systemctl show -p CPUShares httpd
+
+CPUShares=2048
+
+Attention:  bash-completion works on these commands. Type systemctl [tab] [tab] and systemctl set-property httpd [tab] [tab]. How great is that!? This is possible since the bash-completion rpm is installed (for more info: yum info bash-completion)
+Additional systemd tools
+systemd provides a tool, systemd-cgtop, to view the cgroup usage in a top-like format. This is useful for tuning systems & services. For metrics to display, at least one of the following subsystems will need “accounting” enabled. CPUAccounting=1, MemoryAccounting=1, and/or BlockIOAccounting=1. These can be configured with either drop-ins or with systemctl set-property. While tuning a system it's a good idea to use the --runtime option so that changes are temporary and reset upon reboot.
+
+
+
+
+
 Provide a unit summary here.
 
 == TASK 1
