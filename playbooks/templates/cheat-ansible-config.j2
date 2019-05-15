@@ -1,0 +1,21 @@
+#!/bin/bash
+
+FILENAME="/root/.ansible.cfg"
+
+echo "# Creating file ${FILENAME}'"
+
+cat > ${FILENAME} << EOF
+[defaults]
+inventory = /root/inventory
+remote_user = root
+ask_pass = false
+[privilege_escalation]
+become = true
+become_method = sudo
+become_user = root
+become_ask_pass = false
+EOF
+
+echo "# Here are the contents of ${FILENAME}"
+
+cat ${FILENAME}
