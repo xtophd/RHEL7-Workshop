@@ -31,30 +31,57 @@ The Ansible Engine product channel is provided as a convenience with the Red Hat
 == Ansible Concepts
 
 
+There are two types of machines in the Ansible architecture: control nodes and managed hosts . Ansible is installed and run from a control node(s), which also has copies of Ansible configuration files. Managed hosts are listed in an inventory file, which can also organize those systems into groups for easier management. The inventory can be defined in a static text file (INI), or via a dynamic file determined by scripts that get information from external files.
 
+Ansible users create high-level plays to ensure a host or group of hosts are in a particular state. A play performs several tasks , in order, on a host or set of hosts. A file that contains one or more plays is called a playbook. Each task runs a module , a small piece of code that is written in Python, Powershell, or some other language with specific arguments. Each module is a tool in your toolkit. By default, Ansible ships with hundreds of these modules that perform a wide variety of tasks. For example, modules can install software, make API calls, or act on system files.
 
+== RHEL System-Roles Concepts
 
+Red Hat Enterprise Linux (RHEL) 7.4 introduced RHEL System Roles as a Technology Preview. The RHEL System Roles are a collection of Ansible roles and modules that provide a stable and consistent configuration interface to remotely manage RHEL 6.9 and later versions of Red Hat Enterprise Linux (including RHEL 7.5 as a Technology Preview). This effort is based on development of the Linux System Roles upstream project.
 
+RHEL System Roles will provide the user a consistent user interface to provide settings to a given subsystem that is abstract from any one particular implementation or configuration. Thereby, making generic system configurations easy to maintain with consistent automation techniques while maintaining modularity.
 
+The initial set of roles includes:
+  * kdump
+  * postfix
+  * network
+  * selinux
+  * timesync
+  
+The RHEL System Roles are provided in the RHEL Extras channel which provides customers access to select, and quickly evolving system roles. Typically Ansible Engine and the RHEL System Roles only need to be installed on a single, or few, control node(s) which can then be used to manage or configure client nodes. While the roles will likely work with earlier versions, compatibility is only tested against RHEL 6.9 and later clients.
 
-Some instrcutional text
+== Getting Started
+
+The `rhel-system-roles` and `ansible` RPM packages are provided in the RHEL Extras channel. The Extras channel should be enabled by default in your workshop environment. To install Ansible and RHEL System Roles, log into the workstation as root and run the following commands:
 
 .[root@workstation]#
 ----
-ssh node1.example.com
+yum install -y rhel-system-roles ansible
 ----
-
-Describe the expected output if necessary
 
 .Command Output
 [source,indent=4]
 ----
-Output from previous command
+..<SNIP>..
+Package ansible-2.4.2.0-2.el7.noarch already installed and latest
+version
+Resolving Dependencies
+--> Running transaction check
+---> Package rhel-system-roles.noarch 0:0.6-3.el7 will be
+installed
+--> Finished Dependency Resolution
+Installed:
+rhel-system-roles.noarch 0:0.6-3.el7
+..<SNIP>..
 ----
 
-== TASK 2
+RHEL System Roles documentation is located in: `/usr/share/doc/rhel-system-roles/SUBSYSTEM/`
 
-== TASK 3
+Ansible Roles documentation is located in: `/usr/share/ansible/roles/rhel-system-roles.SUBSYSTEM/`
+
+== AdHoc Commands
+
+Now that we have installed Ansible and RHEL System Roles and a general understanding of what Ansible is, let’s create and modify the initial configuration file to run a few modules against our managed hosts using our _inventory_ file.
 
 == Additional Resources
 
