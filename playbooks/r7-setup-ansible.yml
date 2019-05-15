@@ -1,0 +1,23 @@
+---
+- hosts: workstation.example.com
+  unit_host: workstation.example.com
+  unit_euid: student
+  tasks:
+
+    - name: "SETUP ANSIBLE: yum ansible rhel-system-roles "
+      yum: name=ansible,rhel-system-roles state=installed
+
+    - name: "SETUP ANSIBLE: cheat script installs"
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: root
+        group: root
+        mode: 0755
+      with_items:
+        - {src: 'cheat-checkhost.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
+        - {src: 'cheat-ansible-config.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
+        - {src: 'cheat-ansible-inventory.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
+        - {src: 'cheat-ansible-template.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
+        - {src: 'cheat-ansible-playbook.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
+        - {src: 'cheat-ansible-main.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
