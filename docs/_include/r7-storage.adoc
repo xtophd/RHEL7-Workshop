@@ -49,6 +49,7 @@ With SSM, the workflow is as follows:
 
 First, we need to install system-storage-manager utility.
 
+.[root@workstation]#
 ----
 # yum install -y system-storage-manager
 ----
@@ -56,10 +57,13 @@ First, we need to install system-storage-manager utility.
 Notice that there are NO physical storage devices. We are using files mapped as block devices via device-mapper.
 Create a Simple Filesystem
 
+.[root@workstation]#
 ----
 # ssm list devices
 ----
 
+.Command Output
+[source,indent=4]
 ----
 ------------------------------------------------------------------
 Device         Free     Used      Total  Pool          Mount point
@@ -82,10 +86,14 @@ Device         Free     Used      Total  Pool          Mount point
 
 WARNING: If you don't see vdb5-vdb11, then stop and rerun the ansible playbook as described at the top of this lab.
 
+.[root@workstation]#
 ----
 # ssm list volumes
 ----
 
+.Command Output
+[source,indent=4]
+----
 -------------------------------------------------------------------------------------------
 Volume                  Pool          Volume size  FS     FS size       Free  Type    Mount point
 -------------------------------------------------------------------------------------------
@@ -93,13 +101,20 @@ Volume                  Pool          Volume size  FS     FS size       Free  Ty
 /dev/rhel_pwob-r7/root  rhel_pwob-r7      8.51 GB  xfs    8.50 GB    2.72 GB  linear  /
 /dev/vda1                               500.00 MB  xfs  496.67 MB  284.79 MB  part    /boot
 -------------------------------------------------------------------------------------------
+----
 
-=== Traditional filesystem
-Creation
+=== Traditional Filesystem
 
+==== Creation
+
+.[root@workstation]#
+----
 # ssm -f create --fstype ext4 /dev/vdb5 /mnt/exercise1
+----
 
-
+.Command Output
+[source,indent=4]
+----
   Physical volume "/dev/vdb5" successfully created.
   Volume group "lvm_pool" successfully created
   Logical volume "lvol001" created.
@@ -125,25 +140,53 @@ Creating journal (4096 blocks): done
 Writing superblocks and filesystem accounting information: done
 
 Directory '/mnt/exercise1' does not exist! Create (Y/n/q) ? Y
+----
 
+.[root@workstation]#
+----
 # df /mnt/exercise1
+----
 
+.Command Output
+[source,indent=4]
+----
 Filesystem                   1K-blocks  Used Available Use% Mounted on
 /dev/mapper/lvm_pool-lvol001   1011672  2564    940500   1% /mnt/exercise1
-
-Removal and Cleanup
+----
 
+
+==== Removal and Cleanup
+
+.[root@workstation]#
+----
 # ssm -f remove /mnt/exercise1 lvm_pool
+----
 
+.Command Output
+[source,indent=4]
+----
 Device '/dev/lvm_pool/lvol001' is mounted on '/mnt/exercise1' Unmount (N/y/q) ? Y
   Logical volume "lvol001" successfully removed
   Volume group "lvm_pool" successfully removed
+----
 
+.[root@workstation]#
+----
 # pvremove /dev/vdb5
+----
 
+.Command Output
+[source,indent=4]
+----
 Labels on physical volume "/dev/vdb5" successfully wiped
-RAID filesystems
-Creating RAID-1 (Mirrored) Filesystem
+----
+
+=== RAID filesystems
+
+==== Creating RAID-1 (Mirrored) Filesystem
+
+.[root@workstation]#
+----
 # ssm -f create \			
 	--fstype ext4 \			
 	--size 500M \			
@@ -151,8 +194,11 @@ Creating RAID-1 (Mirrored) Filesystem
 	-n exercise2 \			
 	-r 1 \				
 	/dev/vdb{6,7} /mnt/exercise2
+----
 
-
+.Command Output
+[source,indent=4]
+----
 Physical volume "/dev/mapper/loop1p1" successfully created	
 Physical volume "/dev/mapper/loop2p1" successfully created	
 Volume group "summitvg" successfully created			
@@ -167,26 +213,44 @@ naming	=version 2		bsize=4096	ascii-ci=0 ftype=0
 log	=internal log	bsize=4096	blocks=853, version=2
 	=		sectsz=512	sunit=0 blks, lazy-count=1
 realtime =none		extsz=4096	blocks=0, rtextents=0
+----
 
-
-
+.[root@workstation]#
+----
 # df -Th /mnt/exercise2
+----
 
-
+.Command Output
+[source,indent=4]
+----
 Filesystem                     Type  Size  Used Avail Use% Mounted on
 /dev/mapper/summitvg-exercise2 ext4  477M  2.3M  445M   1% /mnt/exercise2
+----
 
 The additional parameter "-o" allows us to specify fields to add or remove to the output.  By using "+" or "-" in front of individual fields, you can add or remove those fields to the standard output.  In the following case, we are removing the "mirror log" and "pv move" columns to accommodate an output that fits this documents width.
 
+.[root@workstation]#
+----
 # lvs -o-mirror_log,move_pv summitvg				
+----
 
-
+.Command Output
+[source,indent=4]
+----
 LV        VG       Attr       LSize   Pool Origin Data%  Meta%  Cpy%Sync Convert
 exercise2 summitvg rwi-aor--- 500.00m                           100.00
+----
 
-Creating RAID-10 (Mirrored and Striped) Filesystem
+=== Creating RAID-10 (Mirrored and Striped) Filesystem
+
+.[root@workstation]#
+----
 # ssm list volumes
+----
 
+.Command Output
+[source,indent=4]
+----
 ------------------------------------------------------------------------------------
 Volume                   Volume size  FS      FS size       Free  Type    Mount point   
 ------------------------------------------------------------------------------------
@@ -195,8 +259,10 @@ Volume                   Volume size  FS      FS size       Free  Type    Mount 
 /dev/summitvg/exercise2  500.00 MB  ext4  500.00 MB  448.94 MB  raid1   /mnt/exercise2
 /dev/vda1                500.00 MB  xfs   496.67 MB  284.79 MB  part    /boot         
 ------------------------------------------------------------------------------------
+----
 
-
+.[root@workstation]#
+----
 # ssm -f create \			
 	--size 500M \			
 	--fstype xfs \			
@@ -204,7 +270,11 @@ Volume                   Volume size  FS      FS size       Free  Type    Mount 
 	--name exercise3 \		
 	--raid 10 \
 /dev/vdb{7..10} /mnt/exercise3
+----
 
+.Command Output
+[source,indent=4]
+----
 Physical	volume "/dev/mapper/loop3p1" successfully created	
 Physical	volume "/dev/mapper/loop4p1" successfully created	
 Physical	volume "/dev/mapper/loop5p1" successfully created	
@@ -221,74 +291,106 @@ naming	=version 2		bsize=4096	ascii-ci=0 ftype=0
 log	=internal log	bsize=4096	blocks=768, version=2
 	=			sectsz=512	sunit=16 blks, lazy-count=1
 realtime =none		extsz=4096	blocks=0, rtextents=0
+----
 
-
+.[root@workstation]#
+----
 # df /mnt/exercise3			
+----
 
-
+.Command Output
+[source,indent=4]
+----
 Filesystem			Type 1K-blocks	Used Available Use% Mounted on
 /dev/mapper/summitvg-exercise3 xfs	103168	5472	97696	6% /mnt/exercise3
+----
 
+.[root@workstation]#
+----
 # lvs summitvg
+----
 
-
+.Command Output
+[source,indent=4]
+----
 LV		VG	Attr	LSize	Pool Origin Data%  Meta%	Move Log Cpy%Sync Convert
 exercise2 summitvg rwi-aor---	52.00m		100.00
 exercise3 summitvg rwi-aor--- 104.00m		100.00
+----
 
-
+.[root@workstation]#
+----
 # lvs -o +segtype summitvg
+----
 
-
+.Command Output
+[source,indent=4]
+----
 LV	VG	Attr	LSize	Pool Origin Data%	Meta%  Move Log Cpy%Sync Convert Type
 exercise2 summitvg rwi-aor---	52.00m	100.00	raid1
 exercise3 summitvg rwi-aor--- 104.00m	100.00	raid10
+----
 
-Virtual Data Optimizer (VDO)
+
+== Virtual Data Optimizer (VDO)
+
 First, we need to ensure the vdo and kmod-kvdo packages are installed.
 
+.[root@workstation]#
+----
 # yum install kmod-kvdo vdo
+----
 
 Notice the the packages were already installed and you are ready to create your optimized filesystems.
 
 Again, recall that there are NO physical storage devices involved in this exercise. We are using files mapped as block devices via device-mapper.  You would NOT do this in a real world scenario.
 
 The workflow will resemble the traditional manual approach with one extra step
-Partition a block device (fdisk or parted)
-Configure VDO
-Create a filesystem (mkfs)
-Mount the filesystem (mount)
-Create entry in /etc/fstab for persistence
-Create an Optimized Filesystem
+
+  * Partition a block device (fdisk or parted)
+  * Configure VDO
+  * Create a filesystem (mkfs)
+  * Mount the filesystem (mount)
+  * Create entry in /etc/fstab for persistence
+  * Create an Optimized Filesystem
+
 There is a second disk (/dev/vdb) which we will be using for this exercise.  The disk has already be partitioned, so we will begin by creating the physical volume, the logical volume group and finally the logical volume.
 
-# vdo create 	--name=exercise4 \
---device=/dev/vdb11 \
---vdoLogicalSize=30G
-
+.[root@workstation]#
+----
+# vdo create 	--name=exercise4 --device=/dev/vdb11 --vdoLogicalSize=30G
 # mkfs.xfs -K /dev/mapper/exercise4
 # mkdir /mnt/exercise4
 # mount /dev/mapper/exercise4 /mnt/exercise4
+----
 
 To make the mount persistent across reboots, you need to either add a systemd unit to mount the filesystem, or add an entry to /etc/fstab as follows:
 
+----
 /dev/mapper/vdo_name /mnt/vdo_name xfs defaults,x-systemd.requires=vdo.service 0 0
+----
 
 
-
-
+.[root@workstation]#
+----
 # vdostats --human-readable
 
 # vdostats --verbose
+----
 
 Let us now populate the filesystem with some content.  Create a bunch of random subdirectories in our new filesystems with the following command.
 
+.[root@workstation]#
+----
 # for i in {1..500} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
+----
 
 Now we will copy this lab manual into each folder as follows
 
+.[root@workstation]#
+----
 # for i in /mnt/exercise4/* ; do cp -v ~/RHEL7lab2018/*.pdf $i ; done
-
+----
 
 A few additional high-level things to know about VDO.  
 
@@ -303,41 +405,6 @@ The default configuration of the index is to use a "dense" index. This index is 
 Please refer to the Red Hat Storage Administration Guide further information on provisioning and managing your data with VDO:
 
 Red Hat Enterprise Linux Storage Administration Guide (VDO)
-
-
-
-
-
-
-
-
-
-
-
-
-
-Provide a unit summary here.
-
-== TASK 1
-
-Some instrcutional text
-
-.[root@workstation]#
-----
-ssh node1.example.com
-----
-
-Describe the expected output if necessary
-
-.Command Output
-[source,indent=4]
-----
-Output from previous command
-----
-
-== TASK 2
-
-== TASK 3
 
 == Additional Resources
 
