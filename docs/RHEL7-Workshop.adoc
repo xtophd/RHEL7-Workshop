@@ -121,7 +121,7 @@ NOTE: you will need true console (GUI) on "0WORKSTATION" for the GUI based units
   . link:{includedir}/r7-ansible.adoc[System Automation:  *ansible, system roles* ]
   . link:{includedir}/r7-systemd.adoc[Service Management: *systemd* ]
   . link:{includedir}/r7-perftune.adoc[Perfomance Analysis & Tuning: *pcp, tuned, numad* ]
-  . link:{includedir}/r7-lvm.adoc[Storage Management: *lvm, ssm, vdo* ]
+  . link:{includedir}/r7-storage.adoc[Storage Management: *lvm, ssm, vdo* ]
   . link:{includedir}/r7-nmcli.adoc[Network Management: *nmcli, bond, teamd* ]
   . link:{includedir}/r7-firewalld.adoc[Firewall Management: *firewalld* ]
   . link:{includedir}/r7-webconsole.adoc[System Management: *web console* ]
