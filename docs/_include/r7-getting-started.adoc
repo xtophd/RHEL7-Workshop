@@ -51,12 +51,30 @@ The preparation script will run for approximately 5 to 7 minutes.
 == A Few Words While the Installer Runs (5 or 6 minutes)
 
 [discrete]
-=== New in RHEL 7
+=== RHEL 7 General Awareness Summary
 
-  * Kernel Version: 
-  * System Compiler: 
-  * Hardware Architectures: 
-  * Default File System: XFS
+  * Architectures: x86-64, POWER, System 390
+    – No more 32-bit Distribution / ISO (32-bit libs available on x86_64 with multilib toolchain)
+  * Dedicated ext2 & ext3 filesystem drivers removed
+    – ext2 & ext3 still enabled and supported via ext4 compatibility mode
+  * Systemd replaces Sys V Init (Upstart)
+  * Firewalld enhances IPTable management
+  * Docker light weight application virtualization (Linux Containers)
+  * grub2 updated Grand Unified Bootloader v2
+  * xfs replaces ext4 as the default filesystem
+  * sssd provides enhanced directory (MS/AD) connectivity
+  * PCP enhanced performance management via Performance Co-Pilot
+  * SSM provides a unified CLI to manage storage
+  * pNFS pNFS Client suppport
+  * ptp &chrony additional (alternatives to ntp) time sync clients
+  * Upgrade & rollback LVM snapshot & merge, or Relax and Recover)
+  * In place upgrade RHEL 6 -> RHEL 7
+
+Some additional specifics.
+
+  * Kernel Version: 3.10.*
+  * System Compiler:  gcc-4.8.5
+  * Default File System: xfs
   * Package Management: Yum
 
 == Conclusion
