@@ -14,7 +14,7 @@ endif::[]
 = Storage Management: lvm, ssm, vdo
 
 
-== LOGICAL VOLUME MANAGER (LVM)
+== Logical Volume Manager (LVM)
 
 With the introduction of RHEL 7, two new storage management interfaces are available:
 
