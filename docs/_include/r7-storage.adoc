@@ -13,9 +13,6 @@ endif::[]
 
 = Storage Management: lvm, ssm, vdo
 
-
-== Logical Volume Manager (LVM)
-
 With the introduction of RHEL 7, two new storage management interfaces are available:
 
   * System Storage Manager (SSM)
@@ -27,9 +24,9 @@ The libStorageMgmt package is a storage array independent Application Programmin
 
 With the release of RHEL 7.5, Red Hat added new technology into storage stack allowing for compression and deduplication.  The technology came by way of the acquisition of a company called Permabit and it is called the Virtual Data Optimizer... or VDO.
 
-== System Storage Manager (SSM)
+== Logical Volume Manager (LVM)
 
-Traditional manual steps to construct a working file-system from the ground up went like this:
+At this moment, we are only going to outline the traditional manual steps to construct a working file-system from the ground up:
 
   * Partition a block device (fdisk or parted)
   * Create a physical volume (pvcreate)
@@ -39,10 +36,14 @@ Traditional manual steps to construct a working file-system from the ground up w
   * Mount the filesystem (mount)
   * Create entry in /etc/fstab for persistence
 
-With SSM, the workflow is as follows:
+I have a separate workshop with focus on LVM and Storage management.  Some of that content will eventually be folded into this unit.
+
+== System Storage Manager (SSM)
+
+With SSM, the workflow to create filesystems is similplied:
 
   * Partition a block device (fdisk or parted)
-  * Create pv, vg, lv, filesystem and mount (ssm)
+  * Use a single ssm command to create the pv, vg, lv, filesystem and mount
   * Add entry in /etc/fstab for persistence
 
 === Getting Started
@@ -51,7 +52,7 @@ First, we need to install system-storage-manager utility.
 
 .[root@workstation]#
 ----
-# yum install -y system-storage-manager
+yum install -y system-storage-manager
 ----
 
 Notice that there are NO physical storage devices. We are using files mapped as block devices via device-mapper.
@@ -59,7 +60,7 @@ Create a Simple Filesystem
 
 .[root@workstation]#
 ----
-# ssm list devices
+ssm list devices
 ----
 
 .Command Output
@@ -88,7 +89,7 @@ WARNING: If you don't see vdb5-vdb11, then stop and rerun the ansible playbook a
 
 .[root@workstation]#
 ----
-# ssm list volumes
+ssm list volumes
 ----
 
 .Command Output
@@ -109,7 +110,7 @@ Volume                  Pool          Volume size  FS     FS size       Free  Ty
 
 .[root@workstation]#
 ----
-# ssm -f create --fstype ext4 /dev/vdb5 /mnt/exercise1
+ssm -f create --fstype ext4 /dev/vdb5 /mnt/exercise1
 ----
 
 .Command Output
@@ -144,7 +145,7 @@ Directory '/mnt/exercise1' does not exist! Create (Y/n/q) ? Y
 
 .[root@workstation]#
 ----
-# df /mnt/exercise1
+df /mnt/exercise1
 ----
 
 .Command Output
@@ -159,7 +160,7 @@ Filesystem                   1K-blocks  Used Available Use% Mounted on
 
 .[root@workstation]#
 ----
-# ssm -f remove /mnt/exercise1 lvm_pool
+ssm -f remove /mnt/exercise1 lvm_pool
 ----
 
 .Command Output
@@ -172,7 +173,7 @@ Device '/dev/lvm_pool/lvol001' is mounted on '/mnt/exercise1' Unmount (N/y/q) ? 
 
 .[root@workstation]#
 ----
-# pvremove /dev/vdb5
+pvremove /dev/vdb5
 ----
 
 .Command Output
@@ -187,7 +188,7 @@ Labels on physical volume "/dev/vdb5" successfully wiped
 
 .[root@workstation]#
 ----
-# ssm -f create \			
+ssm -f create \			
 	--fstype ext4 \			
 	--size 500M \			
 	-p summitvg \			
@@ -217,7 +218,7 @@ realtime =none		extsz=4096	blocks=0, rtextents=0
 
 .[root@workstation]#
 ----
-# df -Th /mnt/exercise2
+df -Th /mnt/exercise2
 ----
 
 .Command Output
@@ -231,7 +232,7 @@ The additional parameter "-o" allows us to specify fields to add or remove to th
 
 .[root@workstation]#
 ----
-# lvs -o-mirror_log,move_pv summitvg				
+lvs -o-mirror_log,move_pv summitvg				
 ----
 
 .Command Output
@@ -245,7 +246,7 @@ exercise2 summitvg rwi-aor--- 500.00m                           100.00
 
 .[root@workstation]#
 ----
-# ssm list volumes
+ssm list volumes
 ----
 
 .Command Output
@@ -263,7 +264,7 @@ Volume                   Volume size  FS      FS size       Free  Type    Mount 
 
 .[root@workstation]#
 ----
-# ssm -f create \			
+ssm -f create \			
 	--size 500M \			
 	--fstype xfs \			
 	--pool summitvg \		
@@ -295,7 +296,7 @@ realtime =none		extsz=4096	blocks=0, rtextents=0
 
 .[root@workstation]#
 ----
-# df /mnt/exercise3			
+df /mnt/exercise3			
 ----
 
 .Command Output
@@ -307,7 +308,7 @@ Filesystem			Type 1K-blocks	Used Available Use% Mounted on
 
 .[root@workstation]#
 ----
-# lvs summitvg
+lvs summitvg
 ----
 
 .Command Output
@@ -320,7 +321,7 @@ exercise3 summitvg rwi-aor--- 104.00m		100.00
 
 .[root@workstation]#
 ----
-# lvs -o +segtype summitvg
+lvs -o +segtype summitvg
 ----
 
 .Command Output
@@ -338,7 +339,7 @@ First, we need to ensure the vdo and kmod-kvdo packages are installed.
 
 .[root@workstation]#
 ----
-# yum install kmod-kvdo vdo
+yum install kmod-kvdo vdo
 ----
 
 Notice the the packages were already installed and you are ready to create your optimized filesystems.
@@ -358,10 +359,10 @@ There is a second disk (/dev/vdb) which we will be using for this exercise.  The
 
 .[root@workstation]#
 ----
-# vdo create 	--name=exercise4 --device=/dev/vdb11 --vdoLogicalSize=30G
-# mkfs.xfs -K /dev/mapper/exercise4
-# mkdir /mnt/exercise4
-# mount /dev/mapper/exercise4 /mnt/exercise4
+vdo create 	--name=exercise4 --device=/dev/vdb11 --vdoLogicalSize=30G
+mkfs.xfs -K /dev/mapper/exercise4
+mkdir /mnt/exercise4
+mount /dev/mapper/exercise4 /mnt/exercise4
 ----
 
 To make the mount persistent across reboots, you need to either add a systemd unit to mount the filesystem, or add an entry to /etc/fstab as follows:
@@ -373,23 +374,22 @@ To make the mount persistent across reboots, you need to either add a systemd un
 
 .[root@workstation]#
 ----
-# vdostats --human-readable
-
-# vdostats --verbose
+vdostats --human-readable
+vdostats --verbose
 ----
 
 Let us now populate the filesystem with some content.  Create a bunch of random subdirectories in our new filesystems with the following command.
 
 .[root@workstation]#
 ----
-# for i in {1..500} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
+for i in {1..500} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
 ----
 
 Now we will copy this lab manual into each folder as follows
 
 .[root@workstation]#
 ----
-# for i in /mnt/exercise4/* ; do cp -v ~/RHEL7lab2018/*.pdf $i ; done
+for i in /mnt/exercise4/* ; do cp -v ~/RHEL7lab2018/*.pdf $i ; done
 ----
 
 A few additional high-level things to know about VDO.  
