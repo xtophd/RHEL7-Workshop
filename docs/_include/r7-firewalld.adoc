@@ -8,30 +8,254 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-= UNIT TITLE
 
-Provide a unit summary here.
 
-== TASK 1
+DYNAMIC FIREWALL WITH FIREWALLD
 
-Some instrcutional text
 
-.[root@workstation]#
-----
-ssh node1.example.com
-----
 
-Describe the expected output if necessary
+The dynamic firewall daemon, firewalld, provides a dynamically managed firewall with support for network “zones” to assign a level of trust to a network and its associated connections and interfaces. It has support for IPv4 and IPv6 firewall settings. It supports Ethernet bridges and has a separation of runtime and permanent configuration options. It also has an interface for services or applications to add firewall rules directly.
 
-.Command Output
-[source,indent=4]
-----
-Output from previous command
-----
+The iptables service stores configuration in /etc/sysconfig/iptables while firewalld stores it in various XML files in /usr/lib/firewalld/ and /etc/firewalld/. 
+Note: The /etc/sysconfig/iptables file does not exist as firewalld is installed by default on Red Hat Enterprise Linux.
 
-== TASK 2
+With the iptables service, every single change means flushing all the old rules and reading all the new rules from /etc/sysconfig/iptables while with firewalld there is no re-creating of all the rules; only the differences are applied. Consequently, firewalld can change the settings during runtime without existing connections being lost.
 
-== TASK 3
+Both firewalld and the legacy iptables command use iptables tool to talk to the kernel packet filter. Using the iptables service interferes with running the firewalld service - do not use them both.
+Note: Making use of the systemctl mask command will ensure that only one or the other service may be started, even if both are available on the system.
+Get started
+1. Log into workstation VM as root.
+
+2. firewalld is already installed and running on RHEL7. These steps will restore firewalld if it has been disabled. The below steps are not necessary to run in this lab 
+
+#	systemctl stop iptables ip6tables 
+#	systemctl disable iptables ip6tables 
+#	yum install firewalld firewall-config 
+#	systemctl enable firewalld 
+#	systemctl start firewalld 
+#	systemctl status -l firewalld 
+
+3. firewalld uses several different, completely adaptable, XML config files to store configurations. These files also ensure run-time and persistent configuration separation. The default configuration files are in /usr/lib/firewalld, while user customized files (which take precedence if they exist) are in /etc/firewalld. 
+
+Examine the default files - both the zones and services files 
+
+# cd /usr/lib/firewalld/zones 
+# cd /usr/lib/firewalld/services 
+
+
+4. firewald uses zones to assign a level of trust to a network and its associated connections and interfaces. The zone files include definitions of Services, Ports (ranges) with protocols, Rich rules, Internet Control Message Protocol (ICMP) blocks , Masquerading and Port/packet forwarding. There are several built-in zones: block, dmz, drop, external, home, internal, public, trusted, work - and you can also create new zones 
+
+Each zone is similar to a complete firewall and there is a single zone selection per environment or connection. The public zone is the Initial default. Zones are identified in ifcfg files or NetworkManager configuration using: ZONE=<name> 
+
+Here is an example of the public zone file from /usr/lib/firewalld/zones
+
+public
+<?xml version="1.0" encoding="utf-8"?> 
+<zone>
+	<service name="ssh"/>
+	<service name="dhcpv6-client"/>
+</zone>
+
+drop
+
+<?xml version="1.0" encoding="utf-8"?> <zone target=”DROP”>
+</zone>
+
+custom
+<?xml version="1.0" encoding="utf-8"?> 
+<zone>
+	<interface name="em2"/> 
+<source address="10.0.1.0/24"/> 
+<service name="ssh"/>
+	<service name="ipp-client"/> 
+<service name="dhcpv6-client"/>
+	<rule><protocol value="ah"/><accept/></rule>
+</zone>
+
+5. There are nearly 50 built-in services files shipped with firewalld. Services files include Port (ranges) with protocol, Netfilter helper modules, and destination address (range) for IPv4 and/or IPv6. You can also create your own services files or customize the default files. To customize a file, simply copy it from /usr/lib/firewalld/services to /etc/firewalld/services then make any required changes. 
+
+Here is an example of the default http.xml services file from /usr/lib/firewalld/services 
+
+<?xml version="1.0" encoding="utf-8"?> 
+<service>
+	<short>WWW (HTTP)</short>
+<description>HTTP is the protocol used to serve Web pages. If you plan to make your Web server publicly available, enable this option. This option is not required for viewing pages locally or developing Web pages.</description>
+	<port protocol="tcp" port="80"/> 
+</service>
+
+Using the firewalld GUI
+
+
+
+1. Start firewall-config - either by running firewall-config from command line or by hitting the super key and typing firewall-config (or until the icon shows) or using the menu bar: Applications → Sundry → Firewall 
+
+2. To identify the current status of the firewall from the GUI  
+Notice Connected in lower left
+Also notice Runtime vs Permanent – upper left Configuration:
+Runtime – changes applied immediately
+Permanent – changes applied at next system start or firewalld reload
+Notice that there is a Runtime to Permanent command under Options
+
+3. In the Lower Right, there are several indicators – Default Zone, Lockdown, Panic Mode 
+
+4. Under the Views menus - select all the available options - ICMP Types, Direct Configuration and Lockdown Whitelist 
+
+5. Look at items under Options – hover over each to get a description 
+
+6. Lets look at the settings for the Default Zone 
+Select Runtime 
+Select Public Zone 
+Under Services tab - look at enabled services
+Check http and https and ssh 
+Under the upper Services Tab - examine the services you have selected – note the ports
+Under Zones - Ports tab - examine ports 
+
+Ports 80, 443, 22 should be enabled, based on the Services you selected 
+
+7. Add a new port and enable Port Forwarding ◦ Still examining the Public Zone 
+In Zone Ports - Click Add and add TCP 8080
+Examine Masquerading and Port Forwarding – there should be nothing there
+If the local web server is listening on 8080 but we want people to access it via port 80 – we can forward port 80 to 8080
+select the Port Forwarding Tab - click add and select Protocol TCP, Port 80, Local Forwarding, 8080
+
+8. Look at the remaining Public Zone tabs 
+Examine ICMP Filter
+Examine Rich Rules
+Click the right arrow (>) twice to Interfaces and Source show
+Examine Interfaces and Sources
+Select the interface and click edit - it allows you to change it’s zone
+ 
+
+9. Any changes you make to the Runtime take effect immediately. However, they will not persist if I reboot or restart the firewall. To make them persistent, you can change from Runtime to Permanent and make all the same changes - or the easier way is to use the Runtime to Permanent command under options. 
+
+Options->Runtime to Permanent – saves the Runtime set up to the Permanent files so it will be this way when we start up – don't do this so that we can revert back to the initial state after the lab 
+
+10.  First let's examine the predefined services 
+Click the Services tab and examine the services 
+
+11. Now we'll create a custom service 
+Note: that there are no custom services 
+
+# ls /etc/firewalld/services/	
+# nothing there
+
+Services can not be modified while in the run time mode - so we must change to Permanent from Runtime 
+Select a service you are not using, such as Samba
+Under Ports and Prococols, click Add
+Enter a new Port, 446 tcp
+
+Now we have a custom samba service with a file in /etc/firewalld/services 
+
+# ls /etc/firewalld/services/
+
+Let's look at it 
+
+# cat /etc/firewalld/services/samba.xml
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+	<short>Samba</short>
+<description>This option allows you to access and participate in Windows file and printer sharing networks. You need the samba package installed for this option to be useful.</description>
+	<port protocol="tcp" port="446"/>
+	<port protocol="udp" port="137"/>
+	<port protocol="udp" port="138"/>
+	<port protocol="tcp" port="139"/>
+	<port protocol="tcp" port="445"/>
+	<module name="nf_conntrack_netbios_ns"/>
+</service>
+
+12. To revert back to using the default Samba service file - we'll simply remove the file in /etc/firewalld/services ◦ change back to Runtime 
+
+# rm /etc/firewalld/services/samba.xml
+
+Change back to Permanent and view the Samba Ports.
+
+Verify defaults are back.
+Using the firewalld CLI
+1. The firewalld command line is firewall-cmd 
+
+# firewall-cmd 
+
+2. First let's check the state and status
+Note: All commands are applied to Runtime by default. Add --permanent to commands to make them apply to permanent environment. if zone isn't specified, then the default zone, in this case public, is assumed. To make commands apply to another zone add --zone=<zone> to the command.
+
+# firewall-cmd --state 
+
+3. To reload the firewalld files use --reload. 
+
+# firewall-cmd --reload 
+
+4. Use the following commands to get information about the firewall: 
+
+# firewall-cmd	--get-active-zones
+
+
+# firewall-cmd --zone=public --list-interfaces
+
+
+# firewall-cmd --zone=public --list-services
+
+
+# firewall-cmd --zone=public --list-all
+
+5. Let's add some services and ports to the public zone (since public is the default - we don't have to explicitly specify it.) First we'll add the http and https services 
+
+# firewall-cmd --add-service=http --add-service=https 
+
+# firewall-cmd --list-services 
+
+Next we'll add port 8080: 
+
+# firewall-cmd --add-port=8080/tcp 
+
+Finally, we'll enable port-forwarding:
+
+# firewall-cmd --add-forward-port=port=80:proto=tcp:toport=8080 
+
+6. Panic mode allows you turn off all network traffic. The panic mode commands are:
+
+# firewall-cmd --query-panic 
+# firewall-cmd --panic-on 
+# firewall-cmd --panic-off 
+
+
+To see panic mode in action open two terminals. In terminal one, ping localhost: 
+
+# ping localhost 
+
+
+
+In terminal two, first query panic mode status: 
+
+# firewall-cmd --query-panic 
+
+Next, turn on panic mode from terminal two.
+
+# firewall-cmd --panic-on
+
+Note the impact on the ping command in terminal one.
+
+Turn panic mode back off.
+
+# firewall-cmd --panic-off
+
+7. A useful option is the timeout option. Add --timeout=<interval><s/m/h> to make a command revert back after so many seconds. This is a great way to test commands without causing lasting damage if you make a mistake. To see the timeout option at work, either use the same to terminals from the last exercise or open two new ones. 
+
+In terminal one run the following command to see the services enabled for the public zone:
+
+# watch firewall-cmd --zone=public --list-services 
+
+In terminal two use the following command to add the mysql service to the public zone - but make it only last for 10 seconds: 
+
+# firewall-cmd --add-service=mysql --timeout=10s 
+
+Verify that mysql shows as a service in first window - and that it disappears in 10 seconds.
+
+Clean Up
+
+1. Revert back to default firewalld configuration either using the GUI (Options->Reload Firewall) or the CLI 
+# firewall-cmd --reload 
+
+2. Close any unneeded terminals 
 
 == Additional Resources
 
