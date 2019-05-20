@@ -15,7 +15,7 @@ endif::[]
 :toc:
 :toclevels: 1
 
-= RHEL7 Workshop
+= The Definitive Red Hat Enterprise Linux 7 Hands-on Lab
 
 [discrete]
 == Presented By
