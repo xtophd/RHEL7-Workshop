@@ -12,7 +12,6 @@ endif::[]
 :toc:
 :toclevels: 1
 
-
 = System Administration with Cockpit
 
 Cockpit is a system administration tool that provides a user interface for monitoring and administering servers through a web browser. It allows you to monitor current values and adjust limits on system resources, control life cycle on container instances, and manipulate container images. 
