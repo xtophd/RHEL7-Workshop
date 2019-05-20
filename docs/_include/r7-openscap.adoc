@@ -103,7 +103,7 @@ Run the scap-workbench utility
 If you are running as root, no Password is necessary (just Cancel the Authentication Request)
 
 ====
-image::image16.jpg[]
+image::image15.jpg[]
 ====
 
 == Reporting
