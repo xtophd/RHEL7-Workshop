@@ -69,9 +69,7 @@ An SCAP specification to maintain integrity of SCAP content and scan results.
   * *Trust Model for Security Automation Data* (TMSAD) — A set of recommendations explaining usage of existing specification to represent signatures, hashes, key information, and identity information in context of an XML file within a security automation domain.
 
 
-TIP: Each of the SCAP components has its own XML-based document format and its XML name space. A compliance policy expressed in SCAP can either take a form of a single OVAL definition XML file, data stream file, single zip archive, or a set of separate XML files containing an XCCDF file that represents a policy checklist.
-
-For more examples please see the RHEL 7 and OpenSCAP documentation.
+TIP: Each of the SCAP components has its own XML-based document format and its XML name space. A compliance policy expressed in SCAP can either take a form of a single OVAL definition XML file, data stream file, single zip archive, or a set of separate XML files containing an XCCDF file that represents a policy checklist. For more examples please see the RHEL 7 and OpenSCAP documentation.
 
 == Installation
 
