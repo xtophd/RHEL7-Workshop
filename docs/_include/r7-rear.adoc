@@ -1,5 +1,7 @@
 :sectnums:
 :sectnumlevels: 3
+:imagesdir: ./_images
+
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -7,7 +9,6 @@ ifdef::env-github[]
 :caution-caption: :fire:
 :warning-caption: :warning:
 endif::[]
-:imagesdir:./_images
 
 :toc:
 :toclevels: 1
@@ -183,7 +184,6 @@ Reboot the system and select “Relax and Recover” from the menu
 ====
 image::image14.jpg[Grub Boot Menu]
 ====
-
 
 Notice the grub username and password from the output of grub.cfg above?  Your username and password are:
 
