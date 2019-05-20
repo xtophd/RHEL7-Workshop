@@ -9,6 +9,8 @@ ifdef::env-github[]
 endif::[]
 :imagesdir: ./_images
 
+:toc:
+:toclevels: 1
 
 
 = System Administration with Cockpit
