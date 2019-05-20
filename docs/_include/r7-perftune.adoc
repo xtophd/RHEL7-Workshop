@@ -474,7 +474,15 @@ Most importantly to look out for are: numa_miss, numa_foreign and other_node val
 
 Below is an example of a RHEL 6 hypervisor running without numad. Notice the VMs are split almost evenly across the sockets.
 
+====
+image::image12.jpg[Without Numad]
+====
+
 Next is the same hardware running numad. Notice the NUMA alignment is almost perfect and the Numa_Miss count dropped from ~2300 to ~7.
+
+====
+image::image4.jpg[With Numad]
+====
 
 === Disable/Enable NUMA Balancing 
 
