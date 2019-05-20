@@ -8,30 +8,203 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-= UNIT TITLE
+:toc:
+:toclevels: 1
 
-Provide a unit summary here.
+= Relax and Recover (REAR)
 
-== TASK 1
+Introduced in RHEL 7.2, Relax-and-Recover is a setup-and-forget Linux bare metal disaster recovery solution. It is easy to set up and requires no maintenance so there is no excuse for not using it. The utility produces a bootable image and restores from backup using this image.
 
-Some instrcutional text
+Some additional background points of interest:
 
-.[root@workstation]#
+  * Supported boot media: ISO, PXE, OBDR tape, USB or eSata storage.
+  * Network protocols: sftp, ftp, http, nfs and cifs
+  * 3rd party Integration: IBM TSM, HP Dataprotector, Symantec NetBackup, SEP Sesam, CommVault Galaxy, EMC Networker (Legato), Bacula and a couple of others…
+
+== Getting Started
+
+=== Installation
+
+Install the required packages
+
 ----
-ssh node1.example.com
+# yum install rear genisoimage syslinux -y 
 ----
 
-Describe the expected output if necessary
+=== Configuration
 
-.Command Output
-[source,indent=4]
+==== Password Generation
+
+In order to properly configure Grub to boot our rescue image, we need generate a hashed password.
+
 ----
-Output from previous command
+# grub2-mkpasswd-pbkdf2
+Enter password: redhat
+Reenter password: redhat
 ----
 
-== TASK 2
+----
+PBKDF2 hash of your password is 
+grub.pbkdf2.sha512.10000.50F96A687B8BCFAE6090234ACB363ABD465A1DBA9E086C26D0E268354EAF7238CEA68889D7B7B0C486BF2AD30A3035C4259EBDFE8A19F4140D241386100B6AAE.C9615BDD47B42A98575DA91854E2017A71B4345F4D52AB03A54347A222C00A3D74A4987CE511DFA76E6B70C57ECE45A3106E4C53C160AFE1C2A3F61123FCFF15
+----
 
-== TASK 3
+==== Configuration File
+
+We will be doing a NFS based backup and recovery.  Modify the configuration file /etc/rear/local.conf on the workstation with these settings.  You should use the password hash that was created above!
+
+NOTE: You can copy /var/tmp/rear-local-config.template to /etc/rear/local.conf to save some time.
+
+----
+OUTPUT=ISO 
+OUTPUT_URL=nfs://server.example.com/tmp
+BACKUP=NETFS 
+BACKUP_URL=nfs://server.example.com/tmp
+SSH_ROOT_PASSWORD="redhat" 
+INCLUDE_ONLY_VG={"rhel"}
+BACKUP_PROG_EXCLUDE=("${BACKUP_PROG_EXCLUDE[@]}" '/media' '/var/tmp' '/var/crash') 
+NETFS_KEEP_OLD_BACKUP_COPY=
+GRUB_RESCUE=y
+GRUB_RESCUE_PASSWORD=”grub.pbkdf2.sha512.10000.50F96A687B8BCFAE6090234ACB363ABD465A1DBA9E086C26D0E268354EAF7238CEA68889D7B7B0C486BF2AD30A3035C4259EBDFE8A19F4140D241386100B6AAE.C9615BDD47B42A98575DA91854E2017A71B4345F4D52AB03A54347A222C00A3D74A4987CE511DFA76E6B70C57ECE45A3106E4C53C160AFE1C2A3F61123FCFF15”
+----
+
+==== Check the NFS Server
+
+Verify that an NFS server has been configured for the lab environment
+
+----
+# showmount -e server.example.com
+----
+
+----
+Export list for server.example.com:
+/tmp *
+----
+
+== Create Recovery Image
+
+Now create the disaster recovery image (est: 2 minutes)
+
+----
+#  rear -v mkrescue
+----
+
+----
+Relax-and-Recover 1.17.2 / Git
+Using log file: /var/log/rear/rear-workstation.log
+Creating disk layout
+Creating root filesystem layout
+Copying files and directories
+Copying binaries and libraries
+Copying kernel modules
+Creating initramfs
+Making ISO image
+Wrote ISO image: /var/lib/rear/output/rear-workstation.iso (135M)
+Modifying local GRUB configuration
+Copying resulting files to nfs location
+----
+
+You  should regularly check the current rescue image against the current host configuration.  If file systems got resized, hardware changed or whatever then it is time to rerun mkrescue.  You could easily put an entry in a cron: rear checklayout || /usr/sbin/rear mkrescue
+
+== Verify Grub Configuraiton
+
+Inspect the grub config, toward the bottom you should see a stanza for Relax and Recover
+
+----
+# cat /boot/grub2/grub.cfg
+----
+
+----
+menuentry "Relax and Recover" --class os --users "" {
+    set root='hd0,msdos1'
+    linux  /rear-kernel selinux=0 console=ttyS0,9600 console=tty0
+    initrd /rear-initrd.cgz
+    password_pbkdf2 rearadmin ”grub.pbkdf2.sha512.10000.505CC0C55BEE0DDCD233AD0B99F76A4420F389973B42D7C7FAD6004558831E06E11D90A97C0FBA57D40588F876F3856C5467ADAFE3E6D73A6C08A44F12482172.F6BA6F0539C6CC2DCEDB94885ED617D3F472214FEF2D8404BAD8D3A88C6F709E3F21EA383436A0FB04369094FC66270B1BAE6298E623EDB972F8E915009D200F”
+}
+----
+
+Inspect additional /etc/grub.d configs for rear modifications
+
+----
+# cat /etc/grub.d/01_users
+----
+
+----
+#!/bin/sh
+cat << EOF
+set superusers="rearadmin"
+password_pbkdf2 rearadmin grub.pbkdf2.sha512.10000.F0288AFF505F766DF9300990B05C3881E15FA9D5A80CDFCF85D836D9D8E0A6CF8F1B296F974349AEE091785F0215BC0289EF3732C621A2D6B77D003A35BC9B22.D3107EC335B9BC9FA877EE097AD5C639BBF1094B0955692E045E00FF6CAB326BB23ACBF9C72D50152101F0FFB4E179D46D9D7B63CA63A3DB8CFCB9B77473487F
+EOF
+----
+
+Inspect the /boot directory for the rear recovery images
+
+----
+# ls -l /boot/rear*
+----
+
+----
+-rw-r--r--. 1 root root 134443207 Apr 17 20:08 /boot/rear-initrd.cgz
+-rwxr-xr-x. 2 root root   4902000 May  5  2014 /boot/rear-kernel
+----
+
+== System Backup
+
+Create backup files (est: 10 minutes)
+
+----
+# rear -d -v mkbackup
+----
+
+== Inspect the NFS server directories
+
+----
+# mount server1:/tmp /mnt
+# cd /mnt
+# ls -la workstation
+----
+
+----
+drwxr-x---. 2 root root       4096 Apr 17 22:41 .
+drwxrwxrwt. 8 root root       4096 Apr 17 19:03 ..
+-rw-------. 1 root root   11146363 Apr 17 22:41 backup.log
+-rw-------. 1 root root 2230269768 Apr 17 22:41 backup.tar.gz
+-rw-------. 1 root root    	    202 Apr 17 22:35 README
+-rw-------. 1 root root     195409 Apr 17 22:35 rear.log
+-rw-------. 1 root root  142227456 Apr 17 22:35 rear-workstation.iso
+-rw-------. 1 root root      	0 Apr 17 22:41 selinux.autorelabel
+-rw-------. 1 root root        283 Apr 17 22:35 VERSION
+----
+
+== System Recovery
+
+Reboot the system and select “Relax and Recover” from the menu
+
+Notice the grub username and password from the output of grub.cfg above?  Your username and password are:
+
+Username: rearadmin
+Password: redhat
+
+Login as “root”.  There will NOT be a password.
+
+----
+Workstation login: root
+----
+
+Finally, run the recovery (est: 5 minutes)
+
+----
+# rear recover
+----
+
+Reboot the system
+
+----
+# reboot
+----
+
+== Final Words
+
+Rear also provides the means to restore the image on to different hardware.  Therefore, relax and recover can be used as a migration utility.
 
 == Additional Resources
 
