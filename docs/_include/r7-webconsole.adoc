@@ -72,6 +72,10 @@ On your workstation, click on Applications (top left corner) -> Firefox Web Brow
 
 Enter URL: “https://localhost:9090/ and login as root:<same password>
 
+====
+image::image8.jpg
+====
+
 === System resources
 
 Basic system information is displayed here.  Real-Time system resource consumption of:
@@ -83,16 +87,25 @@ Basic system information is displayed here.  Real-Time system resource consumpti
 
 TIP: You can also change system performance profile by clicking on “Performance profile: virtual-guest”. You can change the performance profile to fit the system purpose. 
 
+====
+image::image7.jpg
+====
 
 === System Services
 
 Click on Services on the left side of the web browser.  Cockpit will display all available system services and their current state. You can explore individual services by clicking on them. Current version only displays service logs for that service. Later version of Cockpit will give you the ability to start, stop, or restart services.
  
+====
+image::image2.jpg
+====
 
 === System Logs
 
 Cockpit allows you to review logs more efficiently. Click on Logs on the left side of the web browser. Logs can be filtered to display Errors, Warnings, Notices, or All. Additional details of the error can be viewed by clicking on the error. Please try a few.
- 
+
+====
+image::image3.jpg
+====
 
 === Storage
 
@@ -104,16 +117,21 @@ Click on the Networking tab to review the latest networking information and logs
 
 In the following exercise, we will walk you through enabling eth1 for DHCP:
 
-Under Networking:Interfaces section, click on eth1
+  * Under Networking:Interfaces section, click on eth1
+  * You should see real-time data on sending and receiving network packets
+  * To enable eth1, toggle the off switch to on
 
-You should see real-time data on sending and receiving network packets
-
-To enable eth1, toggle the off switch to on
+====
+image::image5.jpg
+====
 
 Under General, check box “Connect automatically”
 
 eth1 status should acquire the new IP info now
 
+====
+image::image13.jpg
+====
 
 == Managing multiple servers
 
@@ -125,8 +143,21 @@ To add additional nodes:
   * Enter hostname: “server1”
   * Click on “add”
   * Repeat the process again and add “server2”
+  
+====
+image::image9.jpg
+====
 
 Once server1 and server2 are added to the dashboard. You are now able to monitor the system resources of all 3 servers from a single dashboard. In previous steps, we also demonstrated using cockpit to manage system services, read system logs, configure network devices and etc. You can also perform those tasks on any of the 3 servers (workstation, server1, and server2) from Cockpit dropdown menu.
+
+====
+image::image6.jpg
+====
+
+====
+image::image2.jpg
+====
+
 
 == Additional Resources
 
