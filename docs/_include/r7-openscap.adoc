@@ -1,1 +1,125 @@
+:sectnums:
+:sectnumlevels: 3
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+
+:toc:
+:toclevels: 1
+
+= OpenSCAP
+
+Red Hat Enterprise Linux provides tools that allow for a fully automated compliance audit. These tools are based on the Security Content Automation Protocol (SCAP) standard and are designed for automated tailoring of compliance policies. 
+
+OpenSCAP is a compliance scanning, reporting and remediation toolset that is policy driven.
+
+The compliance policy can vary substantially across organizations and even across different systems within the same organization. Differences among these policies are based on the purpose of these systems and its importance for the organization. The custom software settings and deployment characteristics also raise a need for custom policy checklists.
+
+== Security Compliance Tools Supported on RHEL7
+
+*SCAP Workbench* — The scap-workbench graphical utility is designed to perform configuration and vulnerability scans on a single local or remote system. It can be also used to generate security reports based on these scans and evaluations.
+
+*OpenSCAP* — The oscap command-line utility is designed to perform configuration and vulnerability scans on a local system, to validate security compliance content, and to generate reports and guides based on these scans and evaluations.
+
+*Script Check Engine* (SCE) — SCE is an extension to the SCAP protocol that allows administrators to write their security content using a scripting language, such as Bash, Python, or Ruby. The SCE extension is provided in the openscap-engine-sce package.
+
+*SCAP Security Guide* (SSG) — The scap-security-guide package provides the latest collection of security policies for Linux systems. The guidance consists of a catalog of practical hardening advice, linked to government requirements where applicable. The project bridges the gap between generalized policy requirements and specific implementation guidelines.
+
+Note: If you require performing automated compliance audits on multiple systems remotely, you can utilize OpenSCAP solution for Red Hat Satellite. (not covered in this lab)
+
+
+SCAP is a vendor-neutral way of expressing security policy, and as such it is widely used in modern enterprises. SCAP specifications create an ecosystem where the format of security content is well known and standardized while the implementation of the scanner or policy editor is not mandated. Such a status enables organizations to build their security policy (SCAP content) once, no matter how many security vendors do they employ.
+
+== SCAP Components
+
+=== Languages
+
+This group consists of SCAP languages that define standard vocabularies and conventions for expressing compliance policy.
+
+  * *eXtensible Configuration Checklist Description Format* (XCCDF) — A language designed to express, organize, and manage security guidance.
+  * *Open Vulnerability and Assessment Language* (OVAL) — A language developed to perform logical assertion about the state of the scanned system.
+  * *Open Checklist Interactive Language* (OCIL) — A language designed to provide a standard way to query users and interpret user responses to the given questions.
+  * *Asset Identification* (AI) — A language developed to provide a data model, methods, and guidance for identifying security assets.
+  * *Asset Reporting Format* (ARF) — A language designed to express the transport format of information about collected security assets and the relationship between assets and security reports.
+
+=== Enumerations 
+
+This group includes SCAP standards that define naming format and an official list or dictionary of items from certain security-related areas of interest.
+
+  * *Common Configuration Enumeration* (CCE) — An enumeration of security-relevant configuration elements for applications and operating systems.
+  * *Common Platform Enumeration* (CPE) — A structured naming scheme used to identify information technology (IT) systems, platforms, and software packages.
+  * *Common Vulnerabilities and Exposures* (CVE) — A reference method to a collection of publicly known software vulnerabilities and exposures.
+
+=== Metrics
+
+This group comprises of frameworks to identify and evaluate security risks.
+
+  * *Common Configuration Scoring System* (CCSS) — A metric system to evaluate security-relevant configuration elements and assign them scores in order to help users to prioritize appropriate response steps.
+  * *Common Vulnerability Scoring System* (CVSS) — A metric system to evaluate software vulnerabilities and assign them scores in order to help users prioritize their security risks.
+
+=== Integrity 
+
+An SCAP specification to maintain integrity of SCAP content and scan results.
+
+  * *Trust Model for Security Automation Data* (TMSAD) — A set of recommendations explaining usage of existing specification to represent signatures, hashes, key information, and identity information in context of an XML file within a security automation domain.
+
+
+TIP: Each of the SCAP components has its own XML-based document format and its XML name space. A compliance policy expressed in SCAP can either take a form of a single OVAL definition XML file, data stream file, single zip archive, or a set of separate XML files containing an XCCDF file that represents a policy checklist.
+
+For more examples please see the RHEL 7 and OpenSCAP documentation.
+
+== Installation
+
+----
+# yum install -y scap-workbench scap-security-guide 
+----
+
+== Compliance Scan 
+
+Run the scap-workbench utility
+
+----
+# scap-workbench
+----
+
+2. Select RHEL7 as your default security guide
+
+3. Open Other Content (File Menu)
+	ssg-> content-> ssg-rhel7-xccdf.xml
+
+4. Select (no customization)
+
+5. Select a profile from the list
+	STIG for Red Hat Enterprise Linux 7 Running GUIs
+
+6. Select Local Machine as the Target.
+
+!! WARNING: DO NOT SELECT THE REMEDIATE CHECKBOX !!
+
+4. Execute the Scan, then wait.  
+If you are running as root, no Password is necessary (just Cancel the Authentication Request)
+
+== Reporting
+
+Click on “Show Report” and review.  The report is viewed through firefox so it may take a moment to load.
+
+== Additional Resources
+
+Red Hat Documentation
+
+    * link:https://https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8-beta/html/installing_identity_management_and_access_control/deploying-session-recording[Deplying Session Recording on Red Hat Enterprise Linux]
+
+[discrete]
+== End of Unit
+
+link:../RHEL7-Workshop.adoc#toc[Return to TOC]
+
+////
+Always end files with a blank line to avoid include problems.
+////
 
