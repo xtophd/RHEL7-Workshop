@@ -8,36 +8,131 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-= UNIT TITLE
 
-Provide a unit summary here.
 
-== TASK 1
+= System Administration with Cockpit
 
-Some instrcutional text
+Cockpit is a system administration tool that provides a user interface for monitoring and administering servers through a web browser. It allows you to monitor current values and adjust limits on system resources, control life cycle on container instances, and manipulate container images. 
 
-.[root@workstation]#
+Here are a few important facts about Cockpit:
+
+  * Cockpit does not add a layer of other functionalities that are not present on your systems. It exposes user interface elements that enable you to interact with the system.
+  * Cockpit does not take control over your servers, in a way that when you configure something from Cockpit, you can only manage it from there. You can effectively move away from Cockpit to the command-line and come back to it at any point.
+  * Cockpit does not require configuration or infrastructure, and once you install it, it is ready for use. You could, however, configure it to make use of the authentication infrastructure that is available to you, for example a single sign-on system like Kerberos.
+  * Cockpit has zero memory and process footprint on the server when not in use.
+  * Cockpit does not store data or policy. This also means it does not have its own users. The users from the systems can authenticate in Cockpit using their system credentials and they keep the same permissions.
+  * Cockpit dynamically updates itself to reflect the current state of the server, within a time frame of a few seconds.
+  * Cockpit is not intended for configuration management. This means that Cockpit itself does not have a predefined template or state for the server that it then imposes on the server. Cockpit can interact with other configuration management systems or custom tools that are manipulating server configuration.
+
+== Getting Started
+
+=== Installation
+
+Log into workstation VM as root 
+
+Verifying that yum repos are enabled to install Cockpit 
+
 ----
-ssh node1.example.com
+# yum repolist
 ----
 
-Describe the expected output if necessary
+Make sure rhel-7-server-rpms, rhel-7-server-optional-rpms and rhel-7-server-extras-rpms repos are enabled.
 
-.Command Output
-[source,indent=4]
+Installing Packages
+
 ----
-Output from previous command
+# yum install -y cockpit cockpit-dashboard
 ----
 
-== TASK 2
+Enabling Services
 
-== TASK 3
+----
+# systemctl enable cockpit
+# systemctl start cockpit
+# systemctl status cockpit
+----
+
+You should see cockpit.service is now active and running
+
+Firewall Configuration
+
+If firewalld is active, configure firewalld to allow cockpit.
+
+----
+# firewall-cmd status
+# firewall-cmd --add-port=9090/tcp
+# firewall-cmd --permanent --add-port=9090/tcp
+----
+
+== Exploring the WebUI
+
+Log into Cockpit user interface
+
+On your workstation, click on Applications (top left corner) -> Firefox Web Browser
+
+Enter URL: “https://localhost:9090/ and login as root:<same password>
+
+=== System resources
+
+Basic system information is displayed here.  Real-Time system resource consumption of:
+
+  * CPU 
+  * Memory
+  * Disk I/O
+  * Network Traffic
+
+TIP: You can also change system performance profile by clicking on “Performance profile: virtual-guest”. You can change the performance profile to fit the system purpose. 
+
+
+=== System Services
+
+Click on Services on the left side of the web browser.  Cockpit will display all available system services and their current state. You can explore individual services by clicking on them. Current version only displays service logs for that service. Later version of Cockpit will give you the ability to start, stop, or restart services.
+ 
+
+=== System Logs
+
+Cockpit allows you to review logs more efficiently. Click on Logs on the left side of the web browser. Logs can be filtered to display Errors, Warnings, Notices, or All. Additional details of the error can be viewed by clicking on the error. Please try a few.
+ 
+
+=== Storage
+
+Click on the Storage tab to review the latest storage logs and partition info of the system. Cockpit also gives you the ability to create partition table, delete, and format partitions, but we will not exercise them in this lab.
+
+=== Networking
+
+Click on the Networking tab to review the latest networking information and logs. You can also create Bond, Team, Bridge, and VLAN through Cockpit. 
+
+In the following exercise, we will walk you through enabling eth1 for DHCP:
+
+Under Networking:Interfaces section, click on eth1
+
+You should see real-time data on sending and receiving network packets
+
+To enable eth1, toggle the off switch to on
+
+Under General, check box “Connect automatically”
+
+eth1 status should acquire the new IP info now
+
+
+== Managing multiple servers
+
+To add additional nodes:
+
+  * Repeat the cockpit installation steps on server1 and server2
+  * On cockpit webui, click on Dashboard
+  * Click on plus (+) button
+  * Enter hostname: “server1”
+  * Click on “add”
+  * Repeat the process again and add “server2”
+
+Once server1 and server2 are added to the dashboard. You are now able to monitor the system resources of all 3 servers from a single dashboard. In previous steps, we also demonstrated using cockpit to manage system services, read system logs, configure network devices and etc. You can also perform those tasks on any of the 3 servers (workstation, server1, and server2) from Cockpit dropdown menu.
 
 == Additional Resources
 
-Red Hat Documentation
+Cockpit Project Page
 
-    * link:https://https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8-beta/html/installing_identity_management_and_access_control/deploying-session-recording[Deplying Session Recording on Red Hat Enterprise Linux]
+    * link:http://cockpit-project.org/blog/category/release.html[Cockpit Project]
 
 [discrete]
 == End of Unit
