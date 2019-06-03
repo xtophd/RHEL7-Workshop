@@ -1,14 +1,16 @@
 ---
-- hosts: workstation.example.com
-  unit_host: workstation.example.com
-  unit_euid: student
+- hosts: node1.example.com
   tasks:
 
     - name: "SETUP PERFTUNE: install packages"
       yum: name=pcp,pcp-gui,numad,numactl state=installed
 
     - name: "SETUP PERFTUNE: system service settings"
-      yum: name=pcmd,pmlogger,numad state=stopped enabled=no
+      service: name="{{ item.svc }}" state=stopped enabled=no
+      with_items:
+        - {svc: pmcd}
+        - {svc: pmlogger}
+        - {svc: numad}
 
     - name: "SETUP PERFTUNE: cheat script installs"
       template:

@@ -1,7 +1,5 @@
 ---
-- hosts: workstation.example.com
-  unit_host: workstation.example.com
-  unit_euid: student
+- hosts: node1.example.com
   tasks:
 
     - name: "SETUP ANSIBLE: install packages"
@@ -16,8 +14,8 @@
         mode: 0755
       with_items:
         - {src: 'cheat-checkhost.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
-        - {src: 'cheat-ansible-config.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
-        - {src: 'cheat-ansible-inventory.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
-        - {src: 'cheat-ansible-template.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
-        - {src: 'cheat-ansible-playbook.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
-        - {src: 'cheat-ansible-main.j2', dest: '/usr/local/bin/cheat-ansible-checkhost.sh'}
+        - {src: 'cheat-ansible-config.j2', dest: '/usr/local/bin/cheat-ansible-config.sh'}
+        - {src: 'cheat-ansible-inventory.j2', dest: '/usr/local/bin/cheat-ansible-inventory.sh'}
+        - {src: 'cheat-ansible-motd-template.j2', dest: '/usr/local/bin/cheat-ansible-motd-template.sh'}
+        - {src: 'cheat-ansible-motd-playbook.j2', dest: '/usr/local/bin/cheat-ansible-motd-playbook.sh'}
+        - {src: 'cheat-ansible-motd-main.j2', dest: '/usr/local/bin/cheat-ansible-motd-main.sh'}
