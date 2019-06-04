@@ -158,7 +158,7 @@ server1.example.com | SUCCESS => {
   }
 ----
 
-== Ansible Playbook wth Roles
+== Ansible Playbook with Roles
 
 Let’s now define the role content for use with Ansible Playbooks that introduces RHEL System Roles. In this case we’ll create a role called “motd”.
 
