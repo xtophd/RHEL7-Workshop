@@ -61,9 +61,27 @@ The RHEL System Roles are provided in the RHEL Extras channel.  Ansible Engine a
 
 == Getting Started
 
-The `rhel-system-roles` and `ansible` RPM packages are provided in the RHEL Extras channel. The Extras channel should be enabled by default in your workshop environment. To install Ansible and RHEL System Roles, log into the workstation as root and run the following commands:
+Starting on the host *workstation.example.com*, let's ssh over to *node1.example.com*.  No password should be required.
 
 .[root@workstation]#
+----
+ssh node1.example.com
+----
+
+Verify that you are on the right host for these exercises.
+
+.[root@node1]#
+----
+cheat-ansible-checkhost.sh
+----
+
+Now you are ready to begin
+
+== Package Installation
+
+The `rhel-system-roles` and `ansible` RPM packages are provided in the RHEL Extras channel. The Extras channel should be enabled by default in your workshop environment.
+
+.[root@node1]#
 ----
 yum install -y rhel-system-roles ansible
 ----
@@ -96,7 +114,7 @@ Now that we have installed Ansible and RHEL System Roles and a general understan
 
 Run the following to create you ansible configuration file.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 cheat-ansible-config.sh
 ----
@@ -105,14 +123,14 @@ cheat-ansible-config.sh
 
 Run the following command to create your _inventory_ file.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 cheat-ansible-inventory.sh
 ----
 
 === Ansible AdHoc: ping
 
-.[root@workstation]#
+.[root@node1]#
 ----
 ansible servers -m ping
 ----
@@ -132,7 +150,7 @@ server1.example.com | SUCCESS => {
 
 === Ansible AdHoc: setup
 
-.[root@workstation]#
+.[root@node1]#
 ----
 ansible -m setup -a ‘filter=ansible_eth0’ server1.example.com
 ----
@@ -170,7 +188,7 @@ Let’s now define the role content for use with Ansible Playbooks that introduc
 
 First, create the directory structure for the “motd” role:
 
-.[root@workstation]#
+.[root@node1]#
 ----
 cd /root
 mkdir roles
@@ -180,28 +198,28 @@ ansible-galaxy init motd
 
 Second, create a jinja template file.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 cheat-ansible-motd-template.sh
 ----
 
 Now modify the main.yml to define a variable
 
-.[root@workstation]#
+.[root@node1]#
 ----
 cheat-ansible-motd-main.sh
 ----
 
 And finally, adjust the playbook to call our new `motd` role.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 cheat-ansible-playbook.sh
 ----
 
 Now run the playbook with our cutom `motd` role.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 ansible-playbook use-motd-role.yml
 ----
@@ -230,7 +248,7 @@ can be identified by the roles configuration within the playbook.
 
 As the user `root`, ssh to `server1.example.com` and verify that the _message of the day_ and been modified to our new standard.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 ssh root@server1.example.com
 ----
