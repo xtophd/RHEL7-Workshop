@@ -33,10 +33,16 @@ The Ansible Engine product channel is provided as a convenience with the Red Hat
 
 == Ansible Concepts
 
+There are two types of machines in the Ansible architecture: 
 
-There are two types of machines in the Ansible architecture: control nodes and managed hosts . Ansible is installed and run from a control node(s), which also has copies of Ansible configuration files. Managed hosts are listed in an inventory file, which can also organize those systems into groups for easier management. The inventory can be defined in a static text file (INI), or via a dynamic file determined by scripts that get information from external files.
+  * control nodes, and 
+  * managed hosts
+  
+Ansible is installed and run from a control node.  Managed hosts are listed and organized in an *inventory*.  The *inventory* can be defined in a static text file (INI), or derived via a dynamic file determined by scripts that get the information from external sources.
 
-Ansible users create high-level plays to ensure a host or group of hosts are in a particular state. A play performs several tasks , in order, on a host or set of hosts. A file that contains one or more plays is called a playbook. Each task runs a module , a small piece of code that is written in Python, Powershell, or some other language with specific arguments. Each module is a tool in your toolkit. By default, Ansible ships with hundreds of these modules that perform a wide variety of tasks. For example, modules can install software, make API calls, or act on system files.
+By executing a *playbook* on a declared *inventory* of managed hosts, ansible runs a collection of *tasks* to transform a mananged host into a desired state.  Each *task* leverages an ansible *module* to perform the actual work and deliver a predictable and consistent outcome.  Ansible ships with hundreds of modules that perform a wide variety of actions.
+
+Playbooks are written using a YAML markup language.
 
 == RHEL System-Roles Concepts
 
@@ -51,7 +57,7 @@ The initial set of roles includes:
   * selinux
   * timesync
   
-The RHEL System Roles are provided in the RHEL Extras channel which provides customers access to select, and quickly evolving system roles. Typically Ansible Engine and the RHEL System Roles only need to be installed on a single, or few, control node(s) which can then be used to manage or configure client nodes. While the roles will likely work with earlier versions, compatibility is only tested against RHEL 6.9 and later clients.
+The RHEL System Roles are provided in the RHEL Extras channel.  Ansible Engine and the RHEL System Roles only need to be installed on the control node(s).  System-Roles compatibility is currently only tested against RHEL 6.9 and later clients.
 
 == Getting Started
 
