@@ -249,7 +249,7 @@ OOMScoreAdjust is use by the Out Of Memory killer and is an  integer between -10
 
 ==== Modify mariadb
 
-NOTE:  newer versions of RHEL 7 (in this case RHEL 7.6) include updated features of systemctl.  In this case we leverage the capability to in place edit the drop-in directly from the command line.
+NOTE:  newer versions of RHEL 7 (in this case RHEL 7.6) include updated features of systemctl.  Here we leverage a new capability to in-place edit the drop-in directly from the command line.
 
 Similar to what you did in the last step, extend the mariadb.service unit with Restart=always. 
 
