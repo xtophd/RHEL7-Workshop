@@ -291,7 +291,7 @@ And finally, adjust the playbook to call our new `motd` role.
 
 .[root@node1]#
 ----
-cheat-ansible-playbook.sh
+cheat-ansible-motd-playbook.sh
 ----
 
 Now run the playbook with our cutom `motd` role.
