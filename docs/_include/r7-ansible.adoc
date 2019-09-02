@@ -291,7 +291,7 @@ Add a variable to the role's default main.yml.
 
 .[root@node1]#
 ----
-cheat-ansible-motd-variable.sh
+cheat-ansible-motd-variables.sh
 ----
 
 And finally, create the playbook to call our new `motd` role.
