@@ -90,7 +90,7 @@ systemctl get-default
 .Command Output
 [source,indent=4]
 ----
-graphical.target
+multi-user.target
 ----
 
 === Services
