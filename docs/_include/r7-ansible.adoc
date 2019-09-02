@@ -108,7 +108,7 @@ TIP: Ansible Roles documentation is located in: `/usr/share/ansible/roles/rhel-s
 
 Now that we have installed Ansible and RHEL System Roles and a general understanding of what Ansible is, let’s create and modify the initial configuration file to run a few modules against our managed hosts using our _inventory_ file.
 
-== Ansible Configuration
+== Configuration
 
 === Create and Distribute SSH Keys
 
