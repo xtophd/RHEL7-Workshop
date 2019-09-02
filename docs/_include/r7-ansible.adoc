@@ -119,6 +119,23 @@ Run the following to create you ansible configuration file.
 cheat-ansible-config.sh
 ----
 
+The previous cheat script creates the ansible configuration for the current user.  The contents are as follows:
+
+/root/.ansible.cfg#
+----
+[defaults]
+inventory = /root/inventory
+remote_user = root
+ask_pass = false
+[privilege_escalation]
+become = true
+become_method = sudo
+become_user = root
+become_ask_pass = false
+----
+
+Take note of the "inventory".  This is now the default file ansible will refer to for hostnames and variables.
+
 === Create Ansible Inventory
 
 Run the following command to create your _inventory_ file.
@@ -126,6 +143,17 @@ Run the following command to create your _inventory_ file.
 .[root@node1]#
 ----
 cheat-ansible-inventory.sh
+----
+
+The previous cheat script creates the default ansible inventory for the current user.  The contents are as follows:
+
+/root/inventory#
+----
+[myself]
+workstation.example.com
+[servers]
+node2.example.com
+node3.example.com
 ----
 
 === Ansible AdHoc: ping
@@ -138,11 +166,11 @@ ansible servers -m ping
 .Command Output
 [source,indent=4]
 ----
-server2.example.com | SUCCESS => {
+node2.example.com | SUCCESS => {
 "changed": false,
 "ping": "pong"
 }
-server1.example.com | SUCCESS => {
+node3.example.com | SUCCESS => {
 "changed": false,
 "ping": "pong"
 }
@@ -152,14 +180,14 @@ server1.example.com | SUCCESS => {
 
 .[root@node1]#
 ----
-ansible -m setup -a ‘filter=ansible_eth0’ server1.example.com
+ansible -m setup -a ‘filter=ansible_eth0’ node2.example.com
 ----
 
 .Command Output
 [source,indent=4]
 ----
 ..<SNIP>..
-server1.example.com | SUCCESS => {
+node2.example.com | SUCCESS => {
   "ansible_facts": {
     "ansible_eth0": {
       "active": true,
