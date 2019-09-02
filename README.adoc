@@ -16,6 +16,8 @@ endif::[]
 = RHEL7-Workshop
 Foundational exercises to introduce core concepts of Red Hat Enterprise Linux 7
 
+NOTE: Focus on this workshop has slowed due to the release of RHEL 8.
+
 Master document for this branch can be found here:
 
 * link:{docsdir}/RHEL7-Workshop.adoc[The Definitive Red Hat Enterprise Linux 7 Hands-on Lab]
