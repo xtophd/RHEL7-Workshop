@@ -259,7 +259,7 @@ node2.example.com | SUCCESS => {
 
 Without specifying the "filter, the setup module will output all the facts discovered about a client.  Go ahead and try it to get an idea of how much info is available.
 
-== Ansible Playbook with Roles
+== Playbook with Roles
 
 Let’s now define the role content for use with Ansible Playbooks that introduces RHEL System Roles. In this case we’ll create a role called “motd”.
 
