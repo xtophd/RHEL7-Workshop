@@ -277,34 +277,89 @@ Second, create a task to modify the system motd.
 
 .[root@node1]#
 ----
-cheat-ansible-motd-task.sh
+cheat-ansible-motd-tasks.sh
 ----
 
-Create a jinja template file.
+Output as follows also shows contents of the file created.
+
+.Command Output
+[source,indent=4]
+----
+# Creating file /root/roles/motd/tasks/main.yml'
+# Here are the contents of /root/roles/motd/tasks/main.yml
+---
+# Tasks file for MOTD
+
+- name: Deliver MOTD file
+  template:
+    src: templates/motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0444
+----
+
+Create a jinja template file which will replace the actual /etc/motd file.
 
 .[root@node1]#
 ----
-cheat-ansible-motd-template.sh
+cheat-ansible-motd-templates.sh
+----
+
+.Command Output
+[source,indent=4]
+----
+# Creating file /root/roles/motd/templates/motd.j2'
+# Here are the contents of /root/roles/motd/templates/motd.j2
+This is the system {{ ansible_hostname }}.
+
+Today’s date is: {{ ansible_date_time.date }}.
+
+Only use this system with permission.
+You can ask {{ system_owner }} for access.
 ----
 
 Add a variable to the role's default main.yml.
 
 .[root@node1]#
 ----
-cheat-ansible-motd-variables.sh
+cheat-ansible-motd-defaults.sh
 ----
 
-And finally, create the playbook to call our new `motd` role.
+.Command Output
+[source,indent=4]
+----
+# Creating file /root/roles/motd/defaults/main.yml'
+# Here are the contents of /root/roles/motd/defaults/main.yml
+system_owner: root@workstation.example.com
+----
+
+And finally, create the playbook in root's home directory to call our new `motd` role.
 
 .[root@node1]#
 ----
 cheat-ansible-motd-playbook.sh
 ----
 
+.Command Output
+[source,indent=4]
+----
+# Creating file /root/use-motd-role.yml'
+# Here are the contents of /root/use-motd-role.yml
+---
+- name: Use MOTD role playbook
+  hosts: node2.example.com
+  user: root
+  become: false
+  roles:
+  - motd
+----
+
 Now run the playbook with our custom `motd` role.
 
 .[root@node1]#
 ----
+cd /root
 ansible-playbook use-motd-role.yml
 ----
 
@@ -315,33 +370,33 @@ PLAY [Use MOTD role playbook]
 *****************************************************************
 TASK [Gathering Facts]
 *****************************************************************
-ok: [server1.example.com]
+ok: [node2.example.com]
 TASK [motd : Deliver MOTD file]
 *****************************************************************
 changed: [server1.example.com]
 PLAY RECAP
 *****************************************************************
-server1.example.com : ok=2 changed=1 unreachable=0
+node2.example.com : ok=2 changed=1 unreachable=0
 failed=0
 ----
 
-When the playbook was executed the tasks continued to perform because the role itself
-can be identified by the roles configuration within the playbook.
-
 === Validation
 
-As the user `root`, ssh to `server1.example.com` and verify that the _message of the day_ and been modified to our new standard.
+As the user `root`, ssh to `node2.example.com` and verify that the _message of the day_ and been modified to our new standard.
 
 .[root@node1]#
 ----
-ssh root@server1.example.com
+ssh root@node2.example.com
 ----
 
 .Command Output
 [source,indent=4]
 ----
-This is the system server1.example.com.
-Today's date is: 2018-05-04.
+Last login: Mon Sep  2 21:18:31 2019 from node1.example.com
+This is the system node2.
+
+Today’s date is: 2019-09-02.
+
 Only use this system with permission.
 You can ask root@workstation.example.com for access.
 ----
