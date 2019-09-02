@@ -27,9 +27,9 @@ The “init” system in RHEL 7 is `systemd` and it replaces Upstart (the SysV �
 
 == Getting started
 
-Log into the host workstation.example.com as root, and collect some data about the boot process.
+Log into the host node1.example.com as root, and collect some data about the boot process.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemd-analyze
 ----
@@ -40,7 +40,7 @@ systemd-analyze
 Startup finished in 329ms (kernel) + 619ms (initrd) + 2.816s (userspace) = 3.766s 
 ----
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemd-analyze blame
 ----
@@ -82,7 +82,7 @@ systemd has a concept similar to SysV init runlevels, called targets.  systemd w
 
 Let's view the current default target.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl get-default
 ----
@@ -97,7 +97,7 @@ graphical.target
 
 As mentioned above, systemd has another concept called a service.  A service is a type of unit which defines the traditional daemon or process.  Now let us look at what services are running on the system. 
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl -t service
 ----
@@ -113,7 +113,7 @@ abrt-oops.service loaded active running ABRT kernel log watcher
 
 Next let's view all of the services available (ie: everything installed, running or not) on the system. The following command is similar to the older chkconfig --list as it will show both enabled and disabled services.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl list-unit-files -t service
 ----
@@ -139,11 +139,11 @@ The state will  be enabled, disabled, static, or masked.  Static indicates that 
 
 Now that we have a good idea of what’s installed on our system, let’s get a basic lamp stack up and running. 
 
-Log into the workstation as root, install the necessary packages and start the services
+Log into the node1 as root, install the necessary packages and start the services
 
 Install the following packages:  httpd, mariadb-server, mariadb, php, php-mysql
 
-.[root@workstation]#
+.[root@node1]#
 ----
 yum install -y httpd mariadb-server mariadb php php-mysql
 ----
@@ -152,7 +152,7 @@ Enable these services to start on boot:  httpd mariadb
 
 systemctl allows us to “glob” units, so enable httpd and mariadb in a single command.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl enable httpd mariadb
 ----
@@ -166,14 +166,14 @@ ln -s '/usr/lib/systemd/system/mariadb.service' '/etc/systemd/system/multi-user.
 
 Start the services
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl start httpd mariadb
 ----
 
 View the status.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl status httpd mariadb
 ----
@@ -207,7 +207,7 @@ While the defaults for unit files won’t need to be altered most of the time, t
 
 Create a drop-in configuration file to extend the default httpd.service unit.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 mkdir /etc/systemd/system/httpd.service.d 
 cd /etc/systemd/system/httpd.service.d 
@@ -225,7 +225,7 @@ OOMScoreAdjust=-1000
 
 Save the config file, exit the editor, and notify systemd of the changes:
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl daemon-reload
 systemctl status httpd
@@ -269,9 +269,9 @@ By default, slices, scopes, and services default to CPUShares=1024. This will wo
 
 Note: The VM Infrastructure in this lab may have different values than 1024. All further commands should still work correctly. 
 
-View the default cgroup hierarchy on our workstation.
+View the default cgroup hierarchy on our system.
 
-.[root@workstation]#
+.[root@node1]#
 ----
 # systemd-cgls
 ----
@@ -297,7 +297,7 @@ Raising or lowering the CPUShares for a service will control the relative amount
 
 Double the default value of CPUShares and verify the change:
 
-.[root@workstation]#
+.[root@node1]#
 ----
 systemctl set-property httpd CPUShares=2048 
 systemctl show -p CPUShares httpd
