@@ -191,11 +191,11 @@ ansible servers -m ping
 .Command Output
 [source,indent=4]
 ----
-node2.example.com | SUCCESS => {
+node3.example.com | SUCCESS => {
 "changed": false,
 "ping": "pong"
 }
-node3.example.com | SUCCESS => {
+node2.example.com | SUCCESS => {
 "changed": false,
 "ping": "pong"
 }
@@ -203,9 +203,12 @@ node3.example.com | SUCCESS => {
 
 === Ansible AdHoc: setup
 
+
+The ansible "setup" module runs at the begining of each play and collects "facts" about a host.  In this example, you will specifically only collects facts about the network interface "eth0".
+
 .[root@node1]#
 ----
-ansible -m setup -a ‘filter=ansible_eth0’ node2.example.com
+ansible -m setup -a 'filter=ansible_eth0' node2.example.com
 ----
 
 .Command Output
@@ -234,6 +237,8 @@ node2.example.com | SUCCESS => {
     "scope": "link"
   }
 ----
+
+Without specifying the "filter, the setup module will output all the facts discovered about a client.  Go ahead and try it to get an idea of how much info is available.
 
 == Ansible Playbook with Roles
 
