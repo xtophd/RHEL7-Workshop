@@ -273,28 +273,35 @@ cd roles
 ansible-galaxy init motd
 ----
 
-Second, create a jinja template file.
+Second, create a task to modify the system motd.
+
+.[root@node1]#
+----
+cheat-ansible-motd-task.sh
+----
+
+Create a jinja template file.
 
 .[root@node1]#
 ----
 cheat-ansible-motd-template.sh
 ----
 
-Now modify the main.yml to define a variable
+Add a variable to the role's default main.yml.
 
 .[root@node1]#
 ----
-cheat-ansible-motd-main.sh
+cheat-ansible-motd-variable.sh
 ----
 
-And finally, adjust the playbook to call our new `motd` role.
+And finally, create the playbook to call our new `motd` role.
 
 .[root@node1]#
 ----
 cheat-ansible-motd-playbook.sh
 ----
 
-Now run the playbook with our cutom `motd` role.
+Now run the playbook with our custom `motd` role.
 
 .[root@node1]#
 ----
