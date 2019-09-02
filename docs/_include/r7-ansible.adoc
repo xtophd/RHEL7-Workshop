@@ -373,7 +373,7 @@ TASK [Gathering Facts]
 ok: [node2.example.com]
 TASK [motd : Deliver MOTD file]
 *****************************************************************
-changed: [server1.example.com]
+changed: [node2.example.com]
 PLAY RECAP
 *****************************************************************
 node2.example.com : ok=2 changed=1 unreachable=0
