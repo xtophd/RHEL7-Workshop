@@ -102,14 +102,11 @@ rhel-system-roles.noarch 0:0.6-3.el7
 ..<SNIP>..
 ----
 
-RHEL System Roles documentation is located in: `/usr/share/doc/rhel-system-roles/SUBSYSTEM/`
+TIP: RHEL System Roles documentation is located in: `/usr/share/doc/rhel-system-roles/SUBSYSTEM/`
 
-Ansible Roles documentation is located in: `/usr/share/ansible/roles/rhel-system-roles.SUBSYSTEM/`
-
-== AdHoc Commands
+TIP: Ansible Roles documentation is located in: `/usr/share/ansible/roles/rhel-system-roles.SUBSYSTEM/`
 
 Now that we have installed Ansible and RHEL System Roles and a general understanding of what Ansible is, let’s create and modify the initial configuration file to run a few modules against our managed hosts using our _inventory_ file.
-
 
 === Configure SSH Keys for Clients
 
@@ -181,7 +178,13 @@ node2.example.com
 node3.example.com
 ----
 
+== AdHoc Commands
+
+A "ansible adhoc command" typically refers to short implementation of ansible launched form the command line without formally creating a "playbook".  For example, why write a playbook to ping a collection of hosts for a quick status check.
+
 === Ansible AdHoc: ping
+
+In this case "servers" refers to the collection of machines as defined in the "inventory".  And '-m' specifies the ansible module we want to execute.
 
 .[root@node1]#
 ----
@@ -201,10 +204,24 @@ node2.example.com | SUCCESS => {
 }
 ----
 
+Any time you are curious as to what the specific list of machines an ansible play will affect, try '--list-hosts'
+
+.[root@node1]#
+----
+ansible servers --list-hosts
+----
+
+.Command Output
+[source,indent=4]
+----
+hosts (2):
+  node2.example.com
+  node3.example.com
+----
+
 === Ansible AdHoc: setup
 
-
-The ansible "setup" module runs at the begining of each play and collects "facts" about a host.  In this example, you will specifically only collects facts about the network interface "eth0".
+The ansible "setup" module runs at the begining of each play and collects "facts" about a host.  In this example, you will specifically only collect facts about the network interface "eth0".
 
 .[root@node1]#
 ----
