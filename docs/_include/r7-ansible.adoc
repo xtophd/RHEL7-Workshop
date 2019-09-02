@@ -110,6 +110,31 @@ Ansible Roles documentation is located in: `/usr/share/ansible/roles/rhel-system
 
 Now that we have installed Ansible and RHEL System Roles and a general understanding of what Ansible is, let’s create and modify the initial configuration file to run a few modules against our managed hosts using our _inventory_ file.
 
+
+=== Configure SSH Keys for Clients
+
+Ansible is agentless.  Thus there is no additional software that needs to be installed on our clients.
+
+Ansible does however use SSH, and so to make it convenient we need to create an SSH key on our ansible host (node1) and distribute that key to our clients (node2 & node3).
+
+Run the following to commands to create the ssh key.  Accept the defaults and leave the passphrase empty (just hit ENTER).
+
+.[root@node1]#
+----
+ssh-keygen
+----
+
+Now distribute the key to your ansible clients.  Use the root password provided to you by your instructor.
+
+.[root@node1]#
+----
+ssh-copy-id node1.example.com
+
+ssh-copy-id node2.example.com
+
+ssh-copy-id node3.example.com
+----
+
 === Create Ansible Configuration
 
 Run the following to create you ansible configuration file.
@@ -134,7 +159,7 @@ become_user = root
 become_ask_pass = false
 ----
 
-Take note of the "inventory".  This is now the default file ansible will refer to for hostnames and variables.
+Take note of the "inventory".  This is now the default file ansible will refer to for hostnames and parameters.
 
 === Create Ansible Inventory
 
