@@ -5,9 +5,6 @@ myDomain = "example.com"
 [workstation:vars]
 myExample = "Sample Parameter"
 
-[core]
-core.example.com
-
 [workstation]
 workstation.example.com
 
