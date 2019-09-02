@@ -7,7 +7,7 @@ echo "# Creating file ${FILENAME}'"
 cat > ${FILENAME} << EOF
 ---
 - name: Use MOTD role playbook
-  hosts: server1.example.com
+  hosts: node2.example.com
   user: root
   become: false
   roles:
