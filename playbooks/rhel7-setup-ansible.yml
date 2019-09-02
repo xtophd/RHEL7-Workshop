@@ -17,6 +17,6 @@
         - {src: 'cheat-ansible-config.j2', dest: '/usr/local/bin/cheat-ansible-config.sh'}
         - {src: 'cheat-ansible-inventory.j2', dest: '/usr/local/bin/cheat-ansible-inventory.sh'}
         - {src: 'cheat-ansible-motd-playbook.j2', dest: '/usr/local/bin/cheat-ansible-motd-playbook.sh'}
-        - {src: 'cheat-ansible-motd-task.j2', dest: '/usr/local/bin/cheat-ansible-motd-task.sh'}
-        - {src: 'cheat-ansible-motd-template.j2', dest: '/usr/local/bin/cheat-ansible-motd-template.sh'}
-        - {src: 'cheat-ansible-motd-variables.j2', dest: '/usr/local/bin/cheat-ansible-motd-variables.sh'}
+        - {src: 'cheat-ansible-motd-tasks.j2', dest: '/usr/local/bin/cheat-ansible-motd-tasks.sh'}
+        - {src: 'cheat-ansible-motd-templates.j2', dest: '/usr/local/bin/cheat-ansible-motd-templates.sh'}
+        - {src: 'cheat-ansible-motd-defaults.j2', dest: '/usr/local/bin/cheat-ansible-motd-defaults.sh'}
