@@ -56,7 +56,7 @@ $version=1.1
 # local non-primary logger
 #LOCALHOSTNAME  n   n   PCP_LOG_DIR/pmlogger/mysummary          -r -T24h10m -c config.Summary
 
-{{ inventory_hostname }}   y   n   PCP_LOG_DIR/pmlogger/mysummary          -r -T24h10m -c config.default -t 10s
+{{ inventory_hostname }}  y  n  PCP_LOG_DIR/pmlogger/{{ inventory_hostname }}  -r -T24h10m -c config.default -t 10s
 
 # remote host
 #remote         n   n   PCP_LOG_DIR/pmlogger/remote             -r -T24h10m -c config.remote
