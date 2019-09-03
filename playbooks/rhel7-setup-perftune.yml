@@ -1,5 +1,11 @@
 ---
 - hosts: node1.example.com
+  handlers:
+  
+    - name" SETUP PERFTUNE (HANDLER): restart pmlogger
+      service: name=pmlogger state=restarted
+      listen: "retart pmlogger"
+      
   tasks:
 
     - name: "SETUP PERFTUNE: install packages"
@@ -11,6 +17,15 @@
         - {svc: pmcd}
         - {svc: pmlogger}
         - {svc: numad}
+
+    - name: "SETUP PERFTUNE: pmlogger config install"
+      template:
+        src: "pmlogger-control.j2"
+        dest: "/etc/pcp/pmlogger/control"
+        owner: root
+        group: root
+        mode: 0644
+      notify: "pmlogger restart"
 
     - name: "SETUP PERFTUNE: cheat script installs"
       template:
