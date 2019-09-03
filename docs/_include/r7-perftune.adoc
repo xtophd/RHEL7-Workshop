@@ -36,6 +36,11 @@ PCP is broken down into two primary components:
 
 Log into the node1 as root, install the necessary packages and start the services
 
+=== PCP Installation
+
+The steps to install performance-co-pilot have already been applied to your environment.  For reference, here is what was done.
+
+.[root@node1]#
 ----
 yum install -y pcp pcp-gui
 systemctl enable pmcd pmlogger
@@ -43,22 +48,26 @@ systemctl start pmcd pmlogger
 systemctl status pmcd pmlogger
 ----
 
-The default logging interval used by the pmlogger service is 60 seconds.  For the purposes of this lab, we will modify the configuration to capture data at 10 seconds.  Edit the configuration as described here:
- 
+The default logging interval used by the pmlogger service is 60 seconds.  For the purposes of this lab, we modified the configuration file */etc/pcp/pmlogger/control* to capture data at 10 seconds.  The line addition was as follows:
+
+./etc/pcp/pmlogger/control
 ----
-vi /etc/pcp/pmlogger/control
+...<snip>
+.
+# local non-primary logger
+#LOCALHOSTNAME  n   n   PCP_LOG_DIR/pmlogger/mysummary          -r -T24h10m -c config.Summary
+
+node1.example.com  y  n  PCP_LOG_DIR/pmlogger/node1.example.com  -r -T24h10m -c config.default -t 10s
+
+# remote host
+#remote         n   n   PCP_LOG_DIR/pmlogger/remote  
+.
+...<snip>
 ----
 
-----
-### duplicate or modify the following line to match
+Having made this configuration change, pmlogger service was restarted
 
-#LOCALHOSTNAME  n  n  PCP_LOG_DIR/pmlogger/mysummary  -r -T24h10m -c config.Summary
-
-node1 y  n  PCP_LOG_DIR/pmlogger/node1  -r -T24h10m -c config.default -t 10s
-----
-
-Having made this configuration change, you will need to restart the pmlogger service
-
+.[root@node1]#
 ----
 systemctl restart pmlogger
 ----
@@ -72,6 +81,7 @@ Next, we are going to use the `pmval` command to look at memory utilization for 
  
 Note: Additional examples and command options are given by running man pmval on the command line 
 
+.[root@node1]#
 ----
 cd /var/log/pcp/pmlogger/node1.example.com
  
@@ -80,12 +90,14 @@ ls -lart
  
 Use the most recent log file (ends in .0) at the bottom of the list for the next command
 
+.[root@node1]#
 ----
 pmval -a 20160606.00.32.0 mem.util.used
 ----
 
 Based on the output, select a relevant start and end time range to analyze 1min of performance data.
  
+.[root@node1]#
 ----
 pmval -a 20160606.00.32.0 -S @00:33:00 -T @00:33:55 mem.util.used
 ----
@@ -97,6 +109,7 @@ Per the pmval output, we were able to go back in time and look at memory utiliza
 
 There is an extensive list of pmval metrics like mem.util.used. To list all available metrics and their descriptions, run the following command:
 
+.[root@node1]#
 ----
 pminfo -t 
 pminfo -t | grep mem.util.used
@@ -105,16 +118,20 @@ pminfo -t | grep mem.util.used
 NOTE: mem.util.used = used memory metric from /proc/meminfo
  
 Explore the metric list and see what else interests you and test it out with pmval
-pmstat - Overall System Performance
+
+=== Overall System Performance: pmstat
 
 We can also review the overall system performance using pmstat command. The following command used logfile 20160606.00.32.0 to display 7 statistic entries starting from 00:33:00.
 
 To test the same command, please change the date-stamped filename and start time accordingly
 
+.[root@node1]#
 ----
 pmstat -a 20160606.00.32.0 -S @00:33:00 -s 7
 ----
 
+.Command Output
+[source,indent=4]
 ----
 @ Sat Jun 6 00:33:00 2016
  
@@ -147,6 +164,7 @@ NOTE: Remember that these tools can work across remote systems to analyze more c
 
 NOTE: If you are using the graphical console of the node1 VM, you should be able to run pmchart from the command line.
 
+.[root@node1]#
 ----
 pmchart
 ----
@@ -157,7 +175,7 @@ pmchart
   * Select cgroups  → cpuacct → usage        	(cgroup.groups.cpuacct.usage)
   * Explore other metrics and chart their live performance
  
-This tool can be used to “playback” collector data to help find root cause analysis.
+This tool can be used to “playback” collector data to help with root cause analysis for example.
 
 
 == Standard Tuning Profiles: tuned
@@ -166,6 +184,7 @@ This tool can be used to “playback” collector data to help find root cause a
  
 For a full list of current tuning profiles:
 
+.[root@node1]#
 ----
 man tuned-profiles
 ----
@@ -174,30 +193,38 @@ man tuned-profiles
  
 Log into the node1 host as root and identify the running profile.
  
+.[root@node1]#
 ----
 tuned-adm active
 ----
 
+.[root@node1]#
 ----
 Current active profile: virtual-guest
 ----
 
 tuned-adm can assess your system and make a tuning profile recommendation. This also sets the default profile for your system at install time
  
+.[root@node1]#
 ----
 tuned-adm recommend 
 ----
 
+.Command Output
+[source,indent=4]
 ----
 virtual-guest
 ----
 
 Next, list the available profiles on your system
  
+.[root@node1]#
 ----
 tuned-adm list
 ----
 
+.Command Output
+[source,indent=4]
 ----
 Available profiles: 
 - balanced 
@@ -236,25 +263,30 @@ NOTE: Red Hat includes specific bare metal and virt profiles for SAP HANA with R
  
 Begin by checking the current status of THP (transparent huge pages)
 
+.[root@node1]#
 ----
 # cat /sys/kernel/mm/transparent_hugepage/enabled
 ----
 
+.Command Output
+[source,indent=4]
 ----
 [always] madvise never
 ----
 
 Now let us create a directory for our custom configuration and then create a config which inherits virtual-guest and then modifies THP.
 
+.[root@node1]#
 ----
 # cd /usr/lib/tuned
 
-
 # mkdir virtual-guest-no-thp
+
 # cd virtual-guest-no-thp 
 
 # vim tuned.conf
 ----
+
 
 ---- 
 ### add the following contents
@@ -268,6 +300,7 @@ transparent_hugepages=never
 
 Now save the file and load the new tuning profile.  Finally, check your work.
 
+.[root@node1]#
 ----
 # tuned-adm profile virtual-guest-no-thp
 # tuned-adm active
@@ -277,6 +310,7 @@ Now save the file and load the new tuning profile.  Finally, check your work.
 Current active profile: virtual-guest-no-thp
 ----
  
+.[root@node1]#
 ----
 # cat /sys/kernel/mm/transparent_hugepage/enabled
 ----
@@ -291,6 +325,7 @@ By looking at other tuned.conf files in /usr/lib/tuned, you will notice that oth
 
 tuned is simple to disable if you choose not to run it.
 
+.[root@node1]#
 ----
 # tuned-adm off 
 # tuned-adm active
@@ -300,6 +335,7 @@ tuned is simple to disable if you choose not to run it.
 No current active profile.
 ----
 
+.[root@node1]#
 ----
 # systemctl stop tuned.service
 # systemctl disable tuned.service
