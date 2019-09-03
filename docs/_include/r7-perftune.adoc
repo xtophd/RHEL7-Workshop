@@ -34,7 +34,7 @@ PCP is broken down into two primary components:
 
 === Getting Started
 
-Log into the workstation as root, install the necessary packages and start the services
+Log into the node1 as root, install the necessary packages and start the services
 
 ----
 yum install -y pcp pcp-gui
@@ -54,7 +54,7 @@ vim /etc/pcp/pmlogger/control
 
 #LOCALHOSTNAME  n  n  PCP_LOG_DIR/pmlogger/mysummary  -r -T24h10m -c config.Summary
 
-workstation  y  n  PCP_LOG_DIR/pmlogger/workstation  -r -T24h10m -c config.default -t 10s
+node1 y  n  PCP_LOG_DIR/pmlogger/node1  -r -T24h10m -c config.default -t 10s
 ----
 
 Having made this configuration change, you will need to restart the pmlogger service
@@ -73,7 +73,7 @@ Next, we are going to use the `pmval` command to look at memory utilization for 
 Note: Additional examples and command options are given by running man pmval on the command line 
 
 ----
-cd /var/log/pcp/pmlogger/workstation
+cd /var/log/pcp/pmlogger/node1.example.com
  
 ls -lart
 ----
@@ -90,7 +90,7 @@ Based on the output, select a relevant start and end time range to analyze 1min 
 pmval -a 20160606.00.32.0 -S @00:33:00 -T @00:33:55 mem.util.used
 ----
 
-Per the pmval output, we were able to go back in time and look at memory utilization history on workstation during a recent 60 second interval
+Per the pmval output, we were able to go back in time and look at memory utilization history on node1 during a recent 60 second interval
 
 [discrete]
 ==== Additional Metrics
@@ -145,7 +145,7 @@ NOTE: Remember that these tools can work across remote systems to analyze more c
 
 === GUI Charting
 
-NOTE: If you are using the graphical console of the workstation VM, you should be able to run pmchart from the command line.
+NOTE: If you are using the graphical console of the node1 VM, you should be able to run pmchart from the command line.
 
 ----
 pmchart
@@ -172,7 +172,7 @@ man tuned-profiles
 
 === Getting Started
  
-Log into the workstation as root and identify the running profile.
+Log into the node1 host as root and identify the running profile.
  
 ----
 tuned-adm active
