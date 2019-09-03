@@ -4,7 +4,7 @@
   
     - name" SETUP PERFTUNE (HANDLER): restart pmlogger
       service: name=pmlogger state=restarted
-      listen: "retart pmlogger"
+      listen: "restart pmlogger"
       
   tasks:
 
