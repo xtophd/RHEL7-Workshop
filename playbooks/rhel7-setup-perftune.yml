@@ -25,7 +25,7 @@
         owner: root
         group: root
         mode: 0644
-      notify: "pmlogger restart"
+      notify: "restart pmlogger"
 
     - name: "SETUP PERFTUNE: cheat script installs"
       template:
