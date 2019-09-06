@@ -108,7 +108,7 @@ Using the most recent log file (ending in .0), let's assign that filename to a v
 
 .[root@node1]#
 ----
-MYPCPLOG=`ls /var/log/pcp/pmlogger/node1.example.com/*.0`
+export MYPCPLOG=`ls /var/log/pcp/pmlogger/node1.example.com/*.0`
 ----
 
 
