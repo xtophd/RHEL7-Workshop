@@ -5,25 +5,32 @@
     - name: "SETUP STORAGE: install packages"
       yum: name=system-storage-manager state=installed        
 
-    - name: SETUP STORAGE (identify disk)
-      shell: if [ -e /dev/vdb ] ; then echo "/dev/vdb"; elif [ -e /dev/sdb ] ; then echo "/dev/sdb" ; else echo "ERROR" ; fi
-      register: mydisk
+    - name: "SETUP STORAGE: identify disk"
+      shell: "if [ -e /dev/vdb ] ; then echo /dev/vdb; elif [ -e /dev/sdb ] ; then echo /dev/sdb ; else exit 1 ; fi"
+      register: mydisk 
       
-    - name: "SETUP STORAGE: mydisk identified as =>  "
-      debug:
-      var: mydisk
+    #- name: "SETUP STORAGE: disk selection result"
+    #  debug:
+    #    msg: "Disk is {{ mydisk.stdout }}"
 
-#    - name: SETUP STORAGE (disk partitions and sync)
-#      shell: 
-#        cmd: |
-#          # Create new partition table
-#          printf "o\nn\ne\n1\n\n\nw\n" | /sbin/fdisk {{ mydisk }}
-#          # Create 6x 1G partitions
-#          for i in {1..6} ; do printf "n\nl\n\n+1G\nw\n" | /sbin/fdisk {{ mydisk }} ; sleep 3; done
-#          # Create 1x 10G partition
-#          printf "n\nl\n\n+10G\nw\n" | /sbin/fdisk {{ mydisk }} ; sleep 3
-#          # Sync Changes
-#          /sbin/partprobe
+    - name: "SETUP STORAGE (checking disk status {{ mydisk.stdout }})"
+      shell: "if [ -e {{ mydisk.stdout }}1 ] ; then echo '** SKIP PARTITIONING ** MANUAL CLEANUP NEEDED **'; exit 1 ; fi"
+      ignore_errors: True
+      register: mydiskcheck
+
+    - name: "SETUP STORAGE: disk partitions and sync"
+      shell: 
+        cmd: |
+          # Create new partition table
+          printf "o\nn\ne\n1\n\n\nw\n" | /sbin/fdisk {{ mydisk.stdout }}
+          # Create 6x 1G partitions
+          for i in {1..6} ; do printf "n\nl\n\n+1G\nw\n" | /sbin/fdisk {{ mydisk.stdout }} ; sleep 3; done
+          # Create 1x 10G partition
+          printf "n\nl\n\n+10G\nw\n" | /sbin/fdisk {{ mydisk.stdout }} ; sleep 3
+          # Sync Changes
+          /sbin/partprobe
+      ignore_errors: True
+      when: mydiskcheck.rc == 0
 
     - name: "SETUP STORAGE: cheat script installs"
       template:
