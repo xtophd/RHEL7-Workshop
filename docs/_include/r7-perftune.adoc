@@ -111,13 +111,12 @@ Using the most recent log file (ending in .0), let's assign that filename to a v
 export MYPCPLOG=`ls /var/log/pcp/pmlogger/node1.example.com/*.0`
 ----
 
-
 .[root@node1]#
 ----
 pmval -a ${MYPCPLOG} mem.util.used
 ----
 
-Based on the output, select a relevant start and end time range to analyze 1min of performance data.
+Based on the output, select a relevant start and end time range to analyze 1min of performance data.  Please note that your specific time range will differ from the samples provided below.
  
 .[root@node1]#
 ----
@@ -143,7 +142,7 @@ Explore the metric list and see what else interests you and test it out with pmv
 
 === Overall System Performance: pmstat
 
-We can also review the overall system performance using pmstat command. The following command used logfile 20160606.00.32.0 to display 7 statistic entries starting from 00:33:00.
+We can also review the overall system performance using pmstat command. The following command uses th epreviously identified log file ${MYPCPLOG} to display 7 statistic entries starting from 00:33:00.
 
 To test the same command, please change the date-stamped filename and start time accordingly
 
