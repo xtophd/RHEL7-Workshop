@@ -93,7 +93,7 @@ Next, we are going to use the `pmval` command to look at memory utilization for 
  
 `pmval`  prints current or archived value for the nominated performance metric.
  
-Note: Additional examples and command options are given by running man pmval on the command line 
+NOTE: Additional examples and command options are given by running `man pmval` on the command line 
 
 .[root@node1]#
 ----
