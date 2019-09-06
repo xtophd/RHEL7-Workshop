@@ -22,17 +22,17 @@
       debug:
       var: mydisk
 
-    - name: SETUP STORAGE (disk partitions and sync)
-      shell: 
-        cmd: |
-          # Create new partition table
-          printf "o\nn\ne\n1\n\n\nw\n" | /sbin/fdisk {{ mydisk }}
-          # Create 6x 1G partitions
-          for i in {1..6} ; do printf "n\nl\n\n+1G\nw\n" | /sbin/fdisk {{ mydisk }} ; sleep 3; done
-          # Create 1x 10G partition
-          printf "n\nl\n\n+10G\nw\n" | /sbin/fdisk {{ mydisk }} ; sleep 3
-          # Sync Changes
-          /sbin/partprobe
+#    - name: SETUP STORAGE (disk partitions and sync)
+#      shell: 
+#        cmd: |
+#          # Create new partition table
+#          printf "o\nn\ne\n1\n\n\nw\n" | /sbin/fdisk {{ mydisk }}
+#          # Create 6x 1G partitions
+#          for i in {1..6} ; do printf "n\nl\n\n+1G\nw\n" | /sbin/fdisk {{ mydisk }} ; sleep 3; done
+#          # Create 1x 10G partition
+#          printf "n\nl\n\n+10G\nw\n" | /sbin/fdisk {{ mydisk }} ; sleep 3
+#          # Sync Changes
+#          /sbin/partprobe
 
     - name: "SETUP STORAGE: cheat script installs"
       template:
@@ -40,6 +40,6 @@
         dest: "{{ item.dest }}"
         owner: root
         group: root
-        mode: 0755
-      with_items:
-        - {src: 'cheat-checkhost.j2', dest: '/usr/local/bin/cheat-storage-checkhost.sh'}
+       mode: 0755
+     with_items:
+       - {src: 'cheat-checkhost.j2', dest: '/usr/local/bin/cheat-storage-checkhost.sh'}
