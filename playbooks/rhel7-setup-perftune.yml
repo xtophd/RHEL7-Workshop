@@ -35,4 +35,4 @@
         group: root
         mode: 0755
       with_items:
-        - {src: 'cheat-checkhost.j2', dest: '/usr/local/bin/cheat-systemd-perftune.sh'}
+        - {src: 'cheat-checkhost.j2', dest: '/usr/local/bin/cheat-perftune-checkhost.sh'}
