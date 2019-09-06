@@ -18,9 +18,9 @@ NOTE: While this lab focuses on RHEL 7, these tools are also available in more r
 
 There are many tools provided in RHEL 7 to help optimize and monitor performance. In this unit we will be looking at:
 
-  * Performance Co-Pilot (PCP), 
-  * tuned
-  * Numad
+  * pcp _(performance co-pilot)_ 
+  * tuned _(tune-dee)_
+  * numad _(numa-dee)_
 
 == Getting Started
 
