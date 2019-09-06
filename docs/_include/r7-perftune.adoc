@@ -22,6 +22,24 @@ There are many tools provided in RHEL 7 to help optimize and monitor performance
   * tuned
   * Numad
 
+== Getting Started
+
+Starting on the host *workstation.example.com*, let's ssh over to *node1.example.com*.  No password should be required.
+
+.[root@workstation]#
+----
+ssh node1.example.com
+----
+
+Verify that you are on the right host for these exercises.
+
+.[root@node1]#
+----
+cheat-perftune-checkhost.sh
+----
+
+Now you are ready to begin
+
 == Performance Co-Pilot
 
 Performance Co-Pilot (PCP) is a suite of tools, services and libraries for acquiring, storing and analyzing system-level performance measurements.  PCP’s light-weight, distributed architecture makes it particularly well suited to centralized analysis of complex systems.
@@ -30,11 +48,6 @@ PCP is broken down into two primary components:
  
   * PCP Collectors: These are the parts of PCP that collect and extract performance data from various sources, e.g. the operating system kernel.
   * PCP Monitors:  These are the parts of PCP that display data collected from hosts (or archives) that have the PCP Collector installed. Many monitor tools are available as part of the core PCP release, while other (typically graphical) monitoring tools are available separately in the PCP GUI package.
-
-
-=== Getting Started
-
-Log into the node1 as root, install the necessary packages and start the services
 
 === PCP Installation
 
@@ -71,7 +84,6 @@ Having made this configuration change, pmlogger service was restarted
 ----
 systemctl restart pmlogger
 ----
-
 
 === Memory Utilization: pmval
 
