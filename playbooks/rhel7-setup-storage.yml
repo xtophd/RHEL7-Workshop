@@ -10,7 +10,7 @@
         cmd: |
           if [[ -e /dev/vdb ]] ; then
             MYDISK="/dev/vdb"
-          elsif [[ -e /dev/sdb ]] ; then
+          elif [[ -e /dev/sdb ]] ; then
             MYDISK="/dev/sdb"
           else
             ## Exit non zero to generate an error
