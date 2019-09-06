@@ -17,11 +17,11 @@
             exit 1
           fi
           # Create new partition table
-          printf "o\nn\ne\n1\n\n\nw\n" | /sbin/fdisk /dev/vdb
+          printf "o\nn\ne\n1\n\n\nw\n" | /sbin/fdisk ${MYDISK}
           # Create 6x 1G partitions
-          for i in {1..6} ; do printf "n\nl\n\n+1G\nw\n" | /sbin/fdisk /dev/vdb ; sleep 3; done
+          for i in {1..6} ; do printf "n\nl\n\n+1G\nw\n" | /sbin/fdisk ${MYDISK} ; sleep 3; done
           # Create 1x 10G partition
-          printf "n\nl\n\n+10G\nw\n" | /sbin/fdisk /dev/vdb ; sleep 3
+          printf "n\nl\n\n+10G\nw\n" | /sbin/fdisk ${MYDISK} ; sleep 3
           # Sync Changes
           /sbin/partprobe
         
