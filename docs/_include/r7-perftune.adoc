@@ -51,7 +51,9 @@ PCP is broken down into two primary components:
 
 === PCP Installation
 
-The steps to install performance-co-pilot have already been applied to your environment.  For reference, here is what was done.
+NOTE: The steps to install performance-co-pilot have already been applied to your environment.  For reference, here is what was done.
+
+The following packages were installed.
 
 .[root@node1]#
 ----
