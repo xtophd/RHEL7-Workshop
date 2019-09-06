@@ -57,7 +57,7 @@ The following packages were installed.
 
 .[root@node1]#
 ----
-yum install -y pcp pcp-gui
+yum install -y pcp pcp-gui pcp-doc
 systemctl enable pmcd pmlogger
 systemctl start pmcd pmlogger
 systemctl status pmcd pmlogger
