@@ -6,16 +6,7 @@
       yum: name=system-storage-manager state=installed        
 
     - name: SETUP STORAGE (identify disk)
-      shell: 
-        cmd: |
-          if [[ -e /dev/vdb ]] ; then
-            echo "/dev/vdb"
-          elif [[ -e /dev/sdb ]] ; then
-            echo "/dev/sdb"
-          else
-            ## Exit non zero to generate an error
-            exit 1
-          fi
+      shell: if [ -e /dev/vdb ] ; then echo "/dev/vdb" elif [ -e /dev/sdb ] ; then echo "/dev/sdb" ; else echo "ERROR" ; fi
       register: mydisk
       
     - name: "SETUP STORAGE: mydisk identified as =>  "
