@@ -89,12 +89,13 @@ systemctl restart pmlogger
 
 === Memory Utilization: pmval
 
+NOTE: Additional examples and command options are available in various man pages: `man pmval` and `man pcp-intro` 
+
+
 Next, we are going to use the `pmval` command to look at memory utilization for a specific time range:   <hr>:<min>:00 to <hr>:<min>:59 iin the latest performance archive log.
  
 `pmval`  prints current or archived value for the nominated performance metric.
  
-NOTE: Additional examples and command options are given by running `man pmval` on the command line 
-
 .[root@node1]#
 ----
 cd /var/log/pcp/pmlogger/node1.example.com
