@@ -9,7 +9,7 @@
   tasks:
 
     - name: "SETUP PERFTUNE: install packages"
-      yum: name=pcp,pcp-gui,numad,numactl state=installed
+      yum: name=pcp,pcp-gui,pcp-doc,numad,numactl state=installed
 
     - name: "SETUP PERFTUNE: system service settings"
       service: name="{{ item.svc }}" state=started enabled=yes
