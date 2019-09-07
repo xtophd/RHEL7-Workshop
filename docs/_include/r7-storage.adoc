@@ -24,9 +24,27 @@ The libStorageMgmt package is a storage array independent Application Programmin
 
 With the release of RHEL 7.5, Red Hat added new technology into storage stack allowing for compression and deduplication.  The technology came by way of the acquisition of a company called Permabit and it is called the Virtual Data Optimizer... or VDO.
 
-== Logical Volume Manager (LVM)
+== Getting Started
 
-At this moment, we are only going to outline the traditional manual steps to construct a working file-system from the ground up:
+Starting on the host *workstation.example.com*, let's ssh over to *node1.example.com*.  No password should be required.
+
+.[root@workstation]#
+----
+ssh node1.example.com
+----
+
+Verify that you are on the right host for these exercises.
+
+.[root@node1]#
+----
+cheat-storage-checkhost.sh
+----
+
+Now you are ready to begin
+
+== Logical Volume Manager (LVM) Review
+
+Let us review the traditional steps administrators perform to manually to construct a working file-system from the ground up:
 
   * Partition a block device (fdisk or parted)
   * Create a physical volume (pvcreate)
@@ -45,8 +63,6 @@ With SSM, the workflow to create filesystems is similplied:
   * Partition a block device (fdisk or parted)
   * Use a single ssm command to create the pv, vg, lv, filesystem and mount
   * Add entry in /etc/fstab for persistence
-
-=== Getting Started
 
 First, we need to install system-storage-manager utility.
 
@@ -85,7 +101,9 @@ Device         Free     Used      Total  Pool          Mount point
 ------------------------------------------------------------------
 ----
 
-WARNING: If you don't see vdb5-vdb11, then stop and rerun the ansible playbook as described at the top of this lab.
+WARNING: If you don't see `/dev/vdb5-vdb11`, then stop and rerun the ansible playbook as described at the top of this lab.
+
+NOTE: it is possible your workshop environment was configured with different hardware and the partitions are reported as `/dev/sdb{5-11}` and not `/dev/vdb{5-11}`.  Just make a mental note and use the correct device paths for the exercises below.
 
 .[root@workstation]#
 ----
@@ -170,6 +188,8 @@ Device '/dev/lvm_pool/lvol001' is mounted on '/mnt/exercise1' Unmount (N/y/q) ? 
   Logical volume "lvol001" successfully removed
   Volume group "lvm_pool" successfully removed
 ----
+
+The filesystem is unmounted, logical volume and group areremoved.  Last step is to wipe the physical volume metadata from the block device.
 
 .[root@workstation]#
 ----
