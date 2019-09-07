@@ -364,9 +364,7 @@ yum install kmod-kvdo vdo
 
 Notice the the packages were already installed and you are ready to create your optimized filesystems.
 
-Again, recall that there are NO physical storage devices involved in this exercise. We are using files mapped as block devices via device-mapper.  You would NOT do this in a real world scenario.
-
-The workflow will resemble the traditional manual approach with one extra step
+VDO has not been integrated into SSM, and so the workflow will resemble the traditional manual approach with one extra step:
 
   * Partition a block device (fdisk or parted)
   * Configure VDO
@@ -375,7 +373,7 @@ The workflow will resemble the traditional manual approach with one extra step
   * Create entry in /etc/fstab for persistence
   * Create an Optimized Filesystem
 
-There is a second disk (/dev/vdb) which we will be using for this exercise.  The disk has already be partitioned, so we will begin by creating the physical volume, the logical volume group and finally the logical volume.
+We will be leveraging a partition on `/dev/vdb`.  The disk has already be partitioned, so we will begin by configuring VDO.
 
 .[root@workstation]#
 ----
@@ -385,32 +383,52 @@ mkdir /mnt/exercise4
 mount /dev/mapper/exercise4 /mnt/exercise4
 ----
 
-To make the mount persistent across reboots, you need to either add a systemd unit to mount the filesystem, or add an entry to /etc/fstab as follows:
+To make the mount persistent across reboots, you need to either add a systemd unit to mount the filesystem, or add an entry to /etc/fstab. as follows:
 
+./etc/fstab
 ----
-/dev/mapper/vdo_name /mnt/vdo_name xfs defaults,x-systemd.requires=vdo.service 0 0
+## Add the following to /etc/fstab
+/dev/mapper/exercise4 /mnt/exercise4 xfs defaults,x-systemd.requires=vdo.service 0 0
 ----
 
 
 .[root@workstation]#
 ----
 vdostats --human-readable
+
 vdostats --verbose
+
+df -h /mnt/exercise4
 ----
 
 Let us now populate the filesystem with some content.  Create a bunch of random subdirectories in our new filesystems with the following command.
 
 .[root@workstation]#
 ----
-for i in {1..500} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
+for i in {1..50} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
 ----
 
-Now we will copy this lab manual into each folder as follows
+Now we will copy the same content into each of the folders as follows.
+
+NOTE: This could take a few minutes.
 
 .[root@workstation]#
 ----
-for i in /mnt/exercise4/* ; do cp -v ~/RHEL7lab2018/*.pdf $i ; done
+for i in /mnt/exercise4/* ; do echo "${i}" ; cp -rf /usr/share/locale $i ; done
 ----
+
+The prevoius command should have copied approximately 100MB in 50 folders yielding about 5G of traditional fielsystem consumption.
+
+Let us now check some statistics.  
+
+.[root@workstation]#
+----
+df /mnt/exercise4
+
+vdostats --human-readable
+----
+
+If you wait and rerun the `df` and `vod-stats` commands, what you will notice is that the space is recovered as VDO detects duplicate blocks and de-dups the data in the background.  It may take a few minutes, but the available filestem capacity should once approach 27G.
 
 A few additional high-level things to know about VDO.  
 
