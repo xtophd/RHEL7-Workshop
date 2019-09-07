@@ -3,7 +3,7 @@
   tasks:
 
     - name: "SETUP STORAGE: install packages"
-      yum: name=system-storage-manager state=installed        
+      yum: name=system-storage-manager,kmod-kvdo,vdo state=installed        
 
     - name: "SETUP STORAGE: identify disk"
       shell: "if [ -e /dev/vdb ] ; then echo /dev/vdb; elif [ -e /dev/sdb ] ; then echo /dev/sdb ; else exit 1 ; fi"
