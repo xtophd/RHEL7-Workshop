@@ -405,7 +405,7 @@ Let us now populate the filesystem with some content.  Create a bunch of random 
 
 .[root@workstation]#
 ----
-for i in {1..50} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
+for i in {1..100} ; do mktemp -d /mnt/exercise4/XXXXXX ; done
 ----
 
 Now we will copy the same content into each of the folders as follows.
@@ -417,7 +417,7 @@ NOTE: This could take a few minutes.
 for i in /mnt/exercise4/* ; do echo "${i}" ; cp -rf /usr/share/locale $i ; done
 ----
 
-The prevoius command should have copied approximately 100MB in 50 folders yielding about 5G of traditional fielsystem consumption.
+The prevoius command should have copied approximately 100MB in 100 folders yielding about 10G of traditional fielsystem consumption.
 
 Let us now check some statistics.  
 
@@ -428,7 +428,7 @@ df /mnt/exercise4
 vdostats --human-readable
 ----
 
-If you wait and rerun the `df` and `vod-stats` commands, what you will notice is that the space is recovered as VDO detects duplicate blocks and de-dups the data in the background.  It may take a few minutes, but the available filestem capacity should once approach 27G.
+If you wait and rerun the `df` and `vod-stats` commands, what you will notice is that the space is recovered as VDO detects duplicate blocks and de-dups the data in the background.  Again. it may take a few minutes, but the available filestem capacity should once approach 27G.
 
 A few additional high-level things to know about VDO.  
 
