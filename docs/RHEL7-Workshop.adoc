@@ -123,7 +123,7 @@ NOTE: you will need true console (GUI) on "0WORKSTATION" for the GUI based units
   . link:{includedir}/r7-perftune.adoc[*TuneD, NUMAd, Perfomance CoPilot* - System Analysis & Tuning] _(node1)_
   . link:{includedir}/r7-storage.adoc[*LVM, SSM, VDO* - Storage Management] _(node1)_
   . link:{includedir}/r7-nmcli.adoc[*NMcli, Bonding, Teaming* - Network Management]
-  . link:{includedir}/r7-firewalld.adoc[*Firewalld* - Firewall Management]
+  . link:{includedir}/r7-firewalld.adoc[*Firewalld* - Firewall Management] _(node1)_
   . link:{includedir}/r7-webconsole.adoc[*Web Console* - System Management]
   . link:{includedir}/r7-openscap.adoc[*OpenSCAP* - System Security]
   . link:{includedir}/r7-rear.adoc[*REAR* - System Backup & Restoration]
