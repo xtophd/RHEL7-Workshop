@@ -69,8 +69,8 @@ Installing Packages for webconsole enablement
 Enable System Services
 
 ----
-# systemctl enable cockpit
-# systemctl start cockpit
+# systemctl enable cockpit libvirtd
+# systemctl start cockpit libvirtd
 ----
 
 NOTE: As shown below, notice that the webconsole has been configured to run on port 443 in addition to  the standard port 9090.
