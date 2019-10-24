@@ -115,6 +115,8 @@ If firewalld is active, configure firewalld to allow cockpit.
 === Configure Network Bridge
 
 
+NOTE: I should be able to swizzle this into a nmcli command, but in the meantime using nmtui.
+
 ----
 nmtui
 ----
@@ -129,7 +131,7 @@ nmtui
 *** Device = eth0
 *** ipv6 = ignore
 
-
+* Activate
 
 
 
