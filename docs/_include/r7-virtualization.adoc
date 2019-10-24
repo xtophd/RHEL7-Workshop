@@ -112,6 +112,26 @@ If firewalld is active, configure firewalld to allow cockpit.
 # firewall-cmd --permanent --add-port=9090/tcp --add-port=443/tcp
 ----
 
+=== Install VM from ISO
+
+Log on to access.redhat.com
+
+Go to Downloads
+
+Select Red Hat Enterprise Linux (rhel 7 or older releases if needed)
+
+right click on link for the 4GB DVD
+
+On our host, change directories to /var/lib/libvirt/images
+
+Be sure to use quotes around the link
+
+
+
+wget "<paste link"
+
+
+
 === Configure Network Bridge
 
 
