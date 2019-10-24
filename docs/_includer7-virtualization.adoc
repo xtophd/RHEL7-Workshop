@@ -1,0 +1,129 @@
+:sectnums:
+:sectnumlevels: 3
+:imagesdir: ./_images
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+:toc:
+:toclevels: 1
+
+= Virtualization Management with Cockpit
+
+You have already been introduced to the Webconsole system administration tool (Cockpit).  With the addition of a few more modules, the utility provides a robust interface for managing (kvm) virtualization.
+
+== Getting Started
+
+Log into workstation VM as student and then use sudo to gain root priviledges.
+
+----
+sudo -i
+----
+
+=== Requirements
+
+First we need to ensure the system being used supports either:
+
+    * Intel VT-x and Intel 64 virtualization extensions
+    * AMD-V and the AMD64 virtualization extensions
+
+This is done the following simple command.
+
+----
+grep -E 'svm|vmx' /proc/cpuinfo
+----
+
+You are looking for either the Intel flag (vtx) or the AMD flag (svm).  A more sophisticated command makes it a little easier to determine.
+
+----
+if grep -qE 'svm|vmx' /proc/cpuinfo ; then echo "Virt Supported" ; else echo "*WARN* Virt NOT Supported"; fi
+----
+
+=== Installation
+
+Verifying that yum repos are enabled to install Cockpit and the virtualization tools.
+
+----
+# yum repolist
+----
+
+Make sure rhel-7-server-rpms, rhel-7-server-optional-rpms and rhel-7-server-extras-rpms repos are enabled.
+
+Installing Packages for virtualization enablement
+
+----
+# yum install -y qemu-kvm libvirt virt-install libvirt-client
+----
+
+Installing Packages for webconsole enablement
+
+----
+# yum install -y cockpit cockpit-dashboard cockpit-machines-ovirt 
+----
+
+Enable System Services
+
+----
+# systemctl enable cockpit
+# systemctl start cockpit
+----
+
+NOTE: As shown below, notice that the webconsole has been configured to run on port 443 in addition to  the standard port 9090.
+
+You should see cockpit.service is now active and running.
+
+----
+# systemctl status cockpit
+# systemctl status cockpit.socket
+----
+
+----
+* cockpit.service - Cockpit Web Service
+   Loaded: loaded (/usr/lib/systemd/system/cockpit.service; static; vendor preset: disabled)
+   Active: active (running) since Thu 2019-10-24 08:39:32 EDT; 15s ago
+     Docs: man:cockpit-ws(8)
+  Process: 14933 ExecStartPre=/usr/sbin/remotectl certificate --ensure --user=root --group=cockpit-ws --selinux-type=etc_t (code=exited, status=0/SUCCESS)
+ Main PID: 14938 (cockpit-ws)
+   CGroup: /system.slice/cockpit.service
+           └─14938 /usr/libexec/cockpit-ws
+
+* cockpit.socket - Cockpit Web Service Socket
+   Loaded: loaded (/usr/lib/systemd/system/cockpit.socket; enabled; vendor preset: disabled)
+  Drop-In: /etc/systemd/system/cockpit.socket.d
+           └─listen.conf
+   Active: active (running) since Thu 2019-10-24 08:01:23 EDT; 38min ago
+     Docs: man:cockpit-ws(8)
+   Listen: [::]:9090 (Stream)
+           [::]:443 (Stream)
+----
+
+Firewall Configuration
+
+If firewalld is active, configure firewalld to allow cockpit.
+
+----
+# firewall-cmd status
+# firewall-cmd --add-port=9090/tcp --add-port=443/tcp
+# firewall-cmd --permanent --add-port=9090/tcp --add-port=443/tcp
+----
+
+
+== Additional Resources
+
+Cockpit Project Page
+
+    * link:http://cockpit-project.org/blog/category/release.html[Cockpit Project]
+
+[discrete]
+== End of Unit
+
+link:../RHEL7-Workshop.adoc#toc[Return to TOC]
+
+////
+Always end files with a blank line to avoid include problems.
+////
