@@ -63,7 +63,7 @@ Installing Packages for virtualization enablement
 Installing Packages for webconsole enablement
 
 ----
-# yum install -y cockpit cockpit-dashboard cockpit-machines-ovirt 
+# yum install -y cockpit cockpit-dashboard cockpit-machines
 ----
 
 Enable System Services
