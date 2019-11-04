@@ -186,23 +186,83 @@ wget "<paste link"
 
 NOTE: I should be able to swizzle this into a nmcli command, but in the meantime using nmtui.
 
+Kinda cool to show all properties:
+
 ----
-nmtui
+nmcli con edit <name>
+nmcli> ?
+nmcli> print
+nmcli> quit
 ----
 
-* Edit Connection
-* Add
-* Bridge
-** Name = virbr1
-** Slave->Add
-** Ethernet
-*** Name = virbr1-slave1
-*** Device = eth0
-*** ipv6 = ignore
+----
+nmcli con modify type bridge con-name virbr1 ifname virbr1 autoconnect yes bridge.stp no ipv6.method ignore
+----
 
-* Activate
+This is what I want ifcfg-<BRIDGE> to look like:
+
+----
+STP=no
+TYPE=Bridge
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=dhcp
+DOMAIN=lab.linuxsoup.com
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=no
+NAME=virbr1
+UUID=cce46d68-750a-45cd-8170-b88a17bc6ac3
+DEVICE=virbr1
+ONBOOT=yes
+AUTOCONNECT_SLAVES=yes
+----
+
+
+----
+nmcli con modify enp0s31f6 connection.master virbr2 connection.slave-type bridge
+----
+
+This is what I want in the ifcfg-<DEVICE> file
+
+----
+DOMAIN="lab.linuxsoup.com"
+DEVICE=enp0s31f6
+HWADDR=10:7B:44:9F:1C:D2
+ONBOOT=yes
+PEERDNS=yes
+PEERROUTES=yes
+DEFROUTE=yes
+MTU=1500
+TYPE=Ethernet
+NAME="System enp0s31f6"
+UUID=b5f59873-5bd2-c5a6-acb6-f03d5581aca5
+BRIDGE=virbr1
+----
+
+
+
+
 
 === Configure Libvirt to use Bridge
+
+----
+cat > /var/tmp/bridge.xml <<EOF
+<network>
+    <name>host-bridge</name>
+    <forward mode="bridge"/>
+    <bridge name="virbr1"/>
+</network>
+EOF
+
+virsh net-define /var/tmp/bridge.xml
+
+virsh net-list --all
+
+virsh net-start host-bridge
+
+virsh net-autostart host-bridge
+----
 
 See reference doc: http://blog.leifmadsen.com/blog/2016/12/01/create-network-bridge-with-nmcli-for-libvirt/
 
