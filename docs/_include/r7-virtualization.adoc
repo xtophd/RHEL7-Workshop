@@ -196,7 +196,7 @@ nmcli> quit
 ----
 
 ----
-nmcli con modify type bridge con-name virbr1 ifname virbr1 autoconnect yes bridge.stp no ipv6.method ignore
+nmcli con add type bridge con-name virbr1 ifname virbr1 autoconnect yes bridge.stp no ipv6.method ignore
 ----
 
 This is what I want ifcfg-<BRIDGE> to look like:
