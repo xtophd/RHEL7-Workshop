@@ -196,7 +196,10 @@ nmcli> quit
 ----
 
 ----
-nmcli con add type bridge con-name virbr1 ifname virbr1 autoconnect yes bridge.stp no ipv6.method ignore
+
+export BRNAME=virbr1 DEVNAME=enp0s31f6
+nmcli con add type bridge con-name ${BRNAME} ifname ${BRNAME} autoconnect yes bridge.stp no ipv6.method ignore
+
 ----
 
 This is what I want ifcfg-<BRIDGE> to look like:
@@ -220,7 +223,8 @@ AUTOCONNECT_SLAVES=yes
 
 
 ----
-nmcli con modify enp0s31f6 connection.master virbr2 connection.slave-type bridge
+rm /etc/sysconf/network-scripts/ifcfg-${DEVNAME}
+nmcli con add type ethernet con-name ${DEVNAME} ifname ${DEVNAME} master virbr1
 ----
 
 This is what I want in the ifcfg-<DEVICE> file
