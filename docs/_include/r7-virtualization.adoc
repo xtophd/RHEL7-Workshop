@@ -249,7 +249,7 @@ cat > /var/tmp/bridge.xml <<EOF
 <network>
     <name>host-bridge</name>
     <forward mode="bridge"/>
-    <bridge name="${DEVNAME}"/>
+    <bridge name="${BRNAME}"/>
 </network>
 EOF
 
