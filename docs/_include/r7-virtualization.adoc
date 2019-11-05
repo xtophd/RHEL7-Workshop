@@ -264,6 +264,12 @@ wget "<paste link>"
 ==== Use Web Console to Install A System
 
 
+==== virt-install to Install A System from ISO
+
+
+==== virt-install to Install A System from Discovery ISO
+
+virt-install --name=vm01 --file=/var/lib/libvirt/images/vm01.qcow2 --file-size=20 --nonsparse --ram=6000 --cdrom=/var/lib/libvirt/images/foreman-discovery-ExampleCom.iso  --graphics vnc
 
 == Additional Resources
 
