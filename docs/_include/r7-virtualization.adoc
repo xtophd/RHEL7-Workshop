@@ -212,17 +212,15 @@ TYPE=Bridge
 PROXY_METHOD=none
 BROWSER_ONLY=no
 BOOTPROTO=dhcp
-DOMAIN=lab.linuxsoup.com
 DEFROUTE=yes
 IPV4_FAILURE_FATAL=no
 IPV6INIT=no
 NAME=virbr1
-UUID=cce46d68-750a-45cd-8170-b88a17bc6ac3
+UUID=3aad9e94-507f-4c54-9579-c7d42e01fbf9
 DEVICE=virbr1
 ONBOOT=yes
 AUTOCONNECT_SLAVES=yes
 ----
-
 
 ----
 rm -f /etc/sysconfig/network-scripts/ifcfg-${DEVNAME}
@@ -232,23 +230,17 @@ nmcli con add type ethernet con-name ${DEVNAME} ifname ${DEVNAME} master ${BRNAM
 This is what I want in the ifcfg-<DEVICE> file
 
 ----
-DOMAIN="lab.linuxsoup.com"
-DEVICE=enp0s31f6
-HWADDR=10:7B:44:9F:1C:D2
-ONBOOT=yes
-PEERDNS=yes
-PEERROUTES=yes
-DEFROUTE=yes
-MTU=1500
 TYPE=Ethernet
-NAME="System enp0s31f6"
-UUID=b5f59873-5bd2-c5a6-acb6-f03d5581aca5
+NAME=enp0s31f6
+UUID=2cdaf676-4f3f-44b3-b038-919eb5965432
+DEVICE=enp0s31f6
+ONBOOT=yes
 BRIDGE=virbr1
 ----
 
-
-
-
+----
+ifdown ${DEVNAME} ; sleep 3 ; ifdown ${BRNAME} ; sleep 3; ifup ${BRNAME}
+----
 
 === Configure Libvirt to use Bridge
 
@@ -257,7 +249,7 @@ cat > /var/tmp/bridge.xml <<EOF
 <network>
     <name>host-bridge</name>
     <forward mode="bridge"/>
-    <bridge name="${DEVICE}"/>
+    <bridge name="${DEVNAME}"/>
 </network>
 EOF
 
