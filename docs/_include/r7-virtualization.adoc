@@ -200,7 +200,7 @@ nmcli> quit
 export BRNAME=virbr1 DEVNAME=enp0s31f6
 
 nmcli con add type bridge con-name ${BRNAME} ifname ${BRNAME} autoconnect yes bridge.stp no ipv6.method ignore
-nmcli con modify ${DEVNAME} connection.autoconnect-slaves yes
+nmcli con modify ${BRNAME} connection.autoconnect-slaves yes
 
 ----
 
