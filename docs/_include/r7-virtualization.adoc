@@ -69,8 +69,8 @@ Installing Packages for webconsole enablement
 Enable System Services
 
 ----
-# systemctl enable cockpit libvirtd
-# systemctl start cockpit libvirtd
+# systemctl enable cockpit.socket libvirtd
+# systemctl start cockpit.socket libvirtd
 ----
 
 NOTE: As shown below, notice that the webconsole has been configured to run on port 443 in addition to  the standard port 9090.
@@ -78,7 +78,6 @@ NOTE: As shown below, notice that the webconsole has been configured to run on p
 You should see cockpit.service is now active and running.
 
 ----
-# systemctl status cockpit
 # systemctl status cockpit.socket
 ----
 
@@ -108,8 +107,9 @@ If firewalld is active, configure firewalld to allow cockpit.
 
 ----
 # firewall-cmd status
-# firewall-cmd --add-port=9090/tcp --add-port=443/tcp
-# firewall-cmd --permanent --add-port=9090/tcp --add-port=443/tcp
+# firewall-cmd --add-port=9090/tcp
+# firewall-cmd --permanent --add-port=9090/tcp
+# firewall-cmd --list-ports
 ----
 
 Verify Virtualization Host Status
@@ -117,7 +117,6 @@ Verify Virtualization Host Status
 ----
 virt-host-validate
 ----
-
 
 ----
 QEMU: Checking for hardware virtualization                                 : PASS
@@ -159,27 +158,6 @@ QEMU: Checking for device assignment IOMMU support                         : WAR
  LXC: Checking for cgroup 'blkio' controller mount-point                   : PASS
  LXC: Checking if device /sys/fs/fuse/connections exists                   : FAIL (Load the 'fuse' module to enable /proc/ overrides)
 ----
-
-
-=== Install VM from ISO
-
-Log on to access.redhat.com
-
-Go to Downloads
-
-Select Red Hat Enterprise Linux (rhel 7 or older releases if needed)
-
-right click on link for the 4GB DVD
-
-On our host, change directories to /var/lib/libvirt/images
-
-Be sure to use quotes around the link
-
-
-
-wget "<paste link"
-
-
 
 === Configure Network Bridge
 
@@ -263,6 +241,29 @@ virsh net-autostart host-bridge
 ----
 
 See reference doc: http://blog.leifmadsen.com/blog/2016/12/01/create-network-bridge-with-nmcli-for-libvirt/
+
+=== Install VM from ISO
+
+==== Fetch ISO from redhat.com
+
+
+Log on to access.redhat.com
+
+Go to Downloads
+
+Select Red Hat Enterprise Linux (rhel 7 or older releases if needed)
+
+right click on link for the 4GB DVD
+
+On our host, change directories to /var/lib/libvirt/images
+
+Be sure to use quotes around the link
+
+wget "<paste link>"
+
+==== Use Web Console to Install A System
+
+
 
 == Additional Resources
 
