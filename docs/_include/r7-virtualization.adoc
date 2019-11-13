@@ -175,6 +175,10 @@ nmcli> quit
 
 ----
 
+
+
+NOTE: Becareful to ensure netowrk connection information is accurate.  IE: don't configure for DHCP if it should be using static IPs
+
 export BRNAME=virbr1 DEVNAME=enp0s31f6
 
 nmcli con add type bridge con-name ${BRNAME} ifname ${BRNAME} autoconnect yes bridge.stp no ipv6.method ignore
