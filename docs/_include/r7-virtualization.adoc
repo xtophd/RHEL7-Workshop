@@ -76,8 +76,8 @@ yum install -y lorax-composer composer-cli cockpit-composer
 Enable System Services
 
 ----
-# systemctl enable cockpit.socket libvirtd
-# systemctl start cockpit.socket libvirtd
+# systemctl enable cockpit.socket lorax-composer.socket libvirtd
+# systemctl start cockpit lorax-composer libvirtd
 ----
 
 NOTE: As shown below, notice that the webconsole has been configured to run on port 443 in addition to  the standard port 9090.
