@@ -66,6 +66,13 @@ Installing Packages for webconsole enablement
 # yum install -y cockpit cockpit-dashboard cockpit-machines 
 ----
 
+To make the creating of custom VM images easy, install the Image-Builder tools
+
+----
+yum install -y lorax-composer composer-cli cockpit-composer
+----
+
+
 Enable System Services
 
 ----
