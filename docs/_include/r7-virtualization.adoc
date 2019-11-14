@@ -57,13 +57,13 @@ Make sure rhel-7-server-rpms, rhel-7-server-optional-rpms and rhel-7-server-extr
 Installing Packages for virtualization enablement
 
 ----
-# yum install -y qemu-kvm libvirt virt-install libvirt-client
+# yum install -y qemu-kvm libvirt virt-install libvirt-client libguestfs-tools
 ----
 
 Installing Packages for webconsole enablement
 
 ----
-# yum install -y cockpit cockpit-dashboard cockpit-machines
+# yum install -y cockpit cockpit-dashboard cockpit-machines 
 ----
 
 Enable System Services
