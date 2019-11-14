@@ -257,14 +257,13 @@ See reference doc: http://blog.leifmadsen.com/blog/2016/12/01/create-network-bri
 
 ==== Fetch ISO from redhat.com
 
-
 Log on to access.redhat.com
 
 Go to Downloads
 
 Select Red Hat Enterprise Linux (rhel 7 or older releases if needed)
 
-copy the URL [right click] for the "Red Hat Enterprise Linux KVM Guest Image"
+copy the URL [right click] for the "Red Hat Enterprise Linux 8.1 Binary DVD"
 
 On our host, change directories to /var/lib/libvirt/images
 
@@ -277,14 +276,58 @@ wget "<paste link>"
 Install httpd
 Service Enable http
 Firewall add http
-Create ks.cfg
+Create /var/www/html/ks.cfg
+
+----
+lang en_US
+keyboard us
+timezone America/New_York --isUtc
+rootpw $1$XJbwDNTe$Wqttcf7vWP5n.nPo2J9mk. --iscrypted
+reboot
+text
+cdrom
+bootloader --location=mbr --append="nofb quiet splash=quiet"
+
+zerombr
+clearpart --drives=sda --all --initlabel
+part /boot --fstype=ext2 --size=512 --ondisk=sda --asprimary
+part pv.01 --size=16000 --grow --ondisk=sda --asprimary
+volgroup vg_rhel pv.01
+logvol /     --fstype=ext4  --vgname=vg_rhel --name=root   --size=6000 --grow
+logvol /var  --fstype=ext4  --vgname=vg_rhel --name=var    --size=4000
+logvol /home --fstype=ext4  --vgname=vg_rhel --name=home   --size=2000
+logvol /tmp  --fstype=ext4  --vgname=vg_rhel --name=tmp    --size=2000
+logvol swap  --fstype=swap  --vgname=vg_rhel --name=swap01 --size=2000
+
+auth --passalgo=sha512 --useshadow
+selinux --enforcing
+firewall --enabled
+skipx
+firstboot --disable
+
+%packages
+@Core
+redhat-lsb-core
+dhclient
+bind-utils
+%end
+----
+
+
 
 ==== Use Web Console to Install A System
 
+Coming Soon...
 
 ==== virt-install to Install A System from ISO
 
-virt-install --name=ocp-bastion --ram=16000 --location=/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso --extra-args="ks=http://rhv2.lab.linuxsoup.com/ks.cfg" --disk /var/lib/libvirt/images/ocp-bastion.qcow2,bus=scsi,sparse=no,size=25 --graphics vnc
+In this example, we are creating a host called "ocp-bastion"
+
+----
+export VM_NAME="ocp-bastion" KS_URL="http://rhv2.lab.linuxsoup.com/ks.cfg"
+
+virt-install --name=${VM_NAME} --ram=16000 --location=/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso  --disk /var/lib/libvirt/images/${VM_NAME}.qcow2,bus=scsi,sparse=no,size=25 --graphics vnc --extra-args="ks=${KS_URL}"
+----
 
 ==== virt-install to Install A System from Discovery ISO
 
