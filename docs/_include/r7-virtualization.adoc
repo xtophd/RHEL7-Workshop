@@ -166,10 +166,8 @@ QEMU: Checking for device assignment IOMMU support                         : WAR
  LXC: Checking if device /sys/fs/fuse/connections exists                   : FAIL (Load the 'fuse' module to enable /proc/ overrides)
 ----
 
-=== Configure Network Bridge
+=== Configure Network Bridge (using nmcli)
 
-
-NOTE: I should be able to swizzle this into a nmcli command, but in the meantime using nmtui.
 
 Kinda cool to show all properties:
 
@@ -180,17 +178,13 @@ nmcli> print
 nmcli> quit
 ----
 
-----
-
-
-
 NOTE: Becareful to ensure netowrk connection information is accurate.  IE: don't configure for DHCP if it should be using static IPs
 
+----
 export BRNAME=virbr1 DEVNAME=enp0s31f6
 
 nmcli con add type bridge con-name ${BRNAME} ifname ${BRNAME} autoconnect yes bridge.stp no ipv6.method ignore
 nmcli con modify ${BRNAME} connection.autoconnect-slaves yes
-
 ----
 
 This is what I want ifcfg-<BRIDGE> to look like:
