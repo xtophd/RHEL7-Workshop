@@ -312,6 +312,7 @@ firstboot --disable
 redhat-lsb-core
 dhclient
 bind-utils
+wget
 %end
 ----
 
