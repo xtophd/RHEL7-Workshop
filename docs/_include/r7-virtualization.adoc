@@ -278,6 +278,17 @@ wget "<paste link>"
 Install httpd
 Service Enable http
 Firewall add http
+
+----
+yum install -y httpd
+systemctl enable httpd
+systemctl start httpd
+
+firewall-cmd --add-service=http
+firewall-cmd --add-service=http --permanent
+----
+
+
 Create /var/www/html/ks.cfg
 
 ----
