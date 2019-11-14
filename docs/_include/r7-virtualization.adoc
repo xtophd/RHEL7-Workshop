@@ -257,7 +257,7 @@ Go to Downloads
 
 Select Red Hat Enterprise Linux (rhel 7 or older releases if needed)
 
-right click on link for the 4GB DVD
+copy the URL [right click] for the "Red Hat Enterprise Linux KVM Guest Image"
 
 On our host, change directories to /var/lib/libvirt/images
 
