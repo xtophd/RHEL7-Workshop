@@ -127,7 +127,7 @@ systemctl status cockpit.socket
 NOTE: If firewalld is active, configure firewalld to allow cockpit.
 
 ----
-firewall-cmd status
+firewall-cmd --state
 firewall-cmd --add-port=9090/tcp --add-service=http
 firewall-cmd --permanent --add-port=9090/tcp --add-service=http
 firewall-cmd --list-ports
