@@ -57,7 +57,7 @@ After you install all the required software, there are some additional tools to 
 Verifying that yum repos are enabled to install Cockpit and the virtualization tools.
 
 ----
-# yum repolist
+yum repolist
 ----
 
 Make sure rhel-7-server-rpms, rhel-7-server-optional-rpms and rhel-7-server-extras-rpms repos are enabled.
@@ -65,13 +65,13 @@ Make sure rhel-7-server-rpms, rhel-7-server-optional-rpms and rhel-7-server-extr
 Installing Packages for virtualization enablement
 
 ----
-# yum install -y qemu-kvm libvirt virt-install libvirt-client libguestfs-tools
+yum install -y qemu-kvm libvirt virt-install libvirt-client libguestfs-tools
 ----
 
 Installing Packages for webconsole enablement
 
 ----
-# yum install -y cockpit cockpit-dashboard cockpit-machines 
+yum install -y cockpit cockpit-dashboard cockpit-machines 
 ----
 
 To make the creating of custom VM images easy, install the Image-Builder tools
@@ -99,7 +99,7 @@ NOTE: As shown below, notice that the webconsole has been configured to run on p
 You should see cockpit.service is now active and running.
 
 ----
-# systemctl status cockpit.socket
+systemctl status cockpit.socket
 ----
 
 ----
@@ -127,11 +127,11 @@ You should see cockpit.service is now active and running.
 NOTE: If firewalld is active, configure firewalld to allow cockpit.
 
 ----
-# firewall-cmd status
-# firewall-cmd --add-port=9090/tcp --add-service=http
-# firewall-cmd --permanent --add-port=9090/tcp --add-service=http
-# firewall-cmd --list-ports
-# firewall-cmd --list-services
+firewall-cmd status
+firewall-cmd --add-port=9090/tcp --add-service=http
+firewall-cmd --permanent --add-port=9090/tcp --add-service=http
+firewall-cmd --list-ports
+firewall-cmd --list-services
 ----
 
 === Verify Virtualization Host Status
