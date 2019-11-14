@@ -272,11 +272,19 @@ Be sure to use quotes around the link
 
 wget "<paste link>"
 
+==== Configure HTTP Accessible ks.cfg
+
+Install httpd
+Service Enable http
+Firewall add http
+Create ks.cfg
+
 ==== Use Web Console to Install A System
 
 
 ==== virt-install to Install A System from ISO
 
+virt-install --name=ocp-bastion --ram=16000 --location=/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso --extra-args="ks=http://rhv2.lab.linuxsoup.com/ks.cfg" --disk /var/lib/libvirt/images/ocp-bastion.qcow2,bus=scsi,sparse=no,size=25 --graphics vnc
 
 ==== virt-install to Install A System from Discovery ISO
 
