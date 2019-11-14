@@ -13,9 +13,13 @@ endif::[]
 :toc:
 :toclevels: 1
 
-= Virtualization Management with Cockpit
+= Virtualization Management
 
-You have already been introduced to the Webconsole system administration tool (Cockpit).  With the addition of a few more modules, the utility provides a robust interface for managing (kvm) virtualization.
+Provided your hardware is reasonably modern, chances are it supports virtualization.  This unit introduces simple virtualization management using kvm and libvirt.  You will learn how to:
+    * Install additional necessary software
+    * Enable necessary system services and firewall ports
+    * Use the command line to create and manage a virtual machine
+    * Use the web console (cockpit) to create and manage a virtual machine
 
 == Getting Started
 
@@ -32,7 +36,9 @@ First we need to ensure the system being used supports either:
     * Intel VT-x and Intel 64 virtualization extensions
     * AMD-V and the AMD64 virtualization extensions
 
-This is done the following simple command.
+This is done with the following simple commands.
+
+You can start by examining the CPU flags (capabilities) advertised by your system.
 
 ----
 grep -E 'svm|vmx' /proc/cpuinfo
@@ -43,6 +49,8 @@ You are looking for either the Intel flag (vtx) or the AMD flag (svm).  A more s
 ----
 if grep -qE 'svm|vmx' /proc/cpuinfo ; then echo "Virt Supported" ; else echo "*WARN* Virt NOT Supported"; fi
 ----
+
+After you install all the required software, there are some additional tools to provide more detailed reporting on system capabilities.
 
 === Installation
 
@@ -73,7 +81,7 @@ yum install -y lorax-composer composer-cli cockpit-composer
 ----
 
 
-Enable System Services
+=== Enable System Services
 
 ----
 # systemctl enable cockpit.socket lorax-composer.socket libvirtd
@@ -108,7 +116,7 @@ You should see cockpit.service is now active and running.
            [::]:443 (Stream)
 ----
 
-Firewall Configuration
+=== Firewall Configuration
 
 If firewalld is active, configure firewalld to allow cockpit.
 
@@ -119,7 +127,7 @@ If firewalld is active, configure firewalld to allow cockpit.
 # firewall-cmd --list-ports
 ----
 
-Verify Virtualization Host Status
+=== Verify Virtualization Host Status
 
 ----
 virt-host-validate
@@ -169,7 +177,7 @@ QEMU: Checking for device assignment IOMMU support                         : WAR
 === Configure Network Bridge (using nmcli)
 
 
-Kinda cool to show all properties:
+Kind-of cool to show all properties:
 
 ----
 nmcli con edit <name>
@@ -283,9 +291,9 @@ cdrom
 bootloader --location=mbr --append="nofb quiet splash=quiet"
 
 zerombr
-clearpart --drives=sda --all --initlabel
-part /boot --fstype=ext2 --size=512 --ondisk=sda --asprimary
-part pv.01 --size=16000 --grow --ondisk=sda --asprimary
+clearpart --drives=vda --all --initlabel
+part /boot --fstype=ext2 --size=512 --ondisk=vda --asprimary
+part pv.01 --size=16000 --grow --ondisk=vda --asprimary
 volgroup vg_rhel pv.01
 logvol /     --fstype=ext4  --vgname=vg_rhel --name=root   --size=6000 --grow
 logvol /var  --fstype=ext4  --vgname=vg_rhel --name=var    --size=4000
@@ -309,10 +317,6 @@ bind-utils
 
 
 
-==== Use Web Console to Install A System
-
-Coming Soon...
-
 ==== virt-install to Install A System from ISO
 
 In this example, we are creating a host called "ocp-bastion"
@@ -320,15 +324,35 @@ In this example, we are creating a host called "ocp-bastion"
 ----
 export VM_NAME="ocp-bastion" KS_URL="http://rhv2.lab.linuxsoup.com/ks.cfg"
 
-virt-install --name=${VM_NAME} --ram=16000 --location=/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso  --disk /var/lib/libvirt/images/${VM_NAME}.qcow2,bus=scsi,sparse=no,size=25 --graphics vnc --extra-args="ks=${KS_URL}"
+
+
+virt-install --name=${VM_NAME} --extra-args="ks=${KS_URL}" --ram=16000 --location=/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso  --disk /var/lib/libvirt/images/${VM_NAME}.qcow2,bus=virtio,sparse=no,size=25 --console pty,target_type=virtio --graphics vnc
 ----
 
-==== virt-install to Install A System from Discovery ISO
+Some simple virtual machine management commands
 
-virt-install --name=vm01 --file=/var/lib/libvirt/images/vm01.qcow2 --file-size=20 --nonsparse --ram=6000 --cdrom=/var/lib/libvirt/images/foreman-discovery-ExampleCom.iso  --graphics vnc
+----
+virsh list
+
+virsh shutdown ocp-bastion
+
+virsh list
+virsh list --all
+
+virsh start ocp-bastion
+
+virsh console ocp-bastion
+
+## use ^] to disconnect the serial console
+
+----
+
+==== Use Web Console to Install A System
+
+Coming Soon...
+
 
 == Additional Resources
-
 
 https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/ch-configure_network_bridging
 
