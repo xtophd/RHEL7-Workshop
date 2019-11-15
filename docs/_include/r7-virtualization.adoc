@@ -340,31 +340,37 @@ wget
 In this example, we are creating a host called "ocp-bastion".  This set of arguments will config a vm, mount and boot from the RHEL Installation ISO, and initiate an automated kickstart install using the ks.cfg our web server is hosting.  This assumes DHCP.
 
 ----
-export VM_NAME="ocp-bastion" KS_URL="http://rhv2.lab.linuxsoup.com/ks.cfg"
+export ISO_PATH="/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso"
+export KS_URL="http://rhv2.lab.linuxsoup.com/ks.cfg"
 
 virt-install \
-    --ram=16000 --location=/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso \
-    --disk /var/lib/libvirt/images/${VM_NAME}.qcow2,bus=virtio,sparse=no,size=25 \
     --console pty,target_type=virtio \
     --graphics vnc \
-    --name ${VM_NAME} \ 
+    --location ${ISO_PATH} \
+    --ram 16000 \
+    --disk bus=virtio,sparse=no,size=25 \
+    --name "vmachine-01" \ 
     --extra-args "ks=${KS_URL}"
 ----
 
 Here is a similar example except specifying the network parameters.
 
 ----
+export ISO_PATH="/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso"
+export KS_URL="http://rhv2.lab.linuxsoup.com/ks.cfg"
+export KS_NET="ip=192.168.1.160 netmask=255.255.255.0 dns=192.168.1.30 gateway=192.168.1.1"
+
 virt-install \
-    --disk /var/lib/libvirt/images/${VM_NAME}.qcow2,bus=virtio,sparse=no,size=25 \
     --console pty,target_type=virtio \
     --graphics vnc \
+    --location ${ISO_PATH} \
     --ram 16000 \
-    --location /var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso \
-    --name ${VM_NAME} \
-    --extra-args "ks=${KS_URL} ip=192.168.1.160 netmask=255.255.255.0 dns=192.168.1.30 gateway=192.168.1.1"
+    --disk bus=virtio,sparse=no,size=25 \
+    --extra-args "ks=${KS_URL} ${KS_NET}"
+    --name "vmachine-02" \
 ----
 
-Some simple virtual machine management commands
+Some additional simple virtual machine management commands
 
 ----
 virsh list
