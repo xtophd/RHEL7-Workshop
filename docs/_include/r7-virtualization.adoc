@@ -281,21 +281,9 @@ wget "<paste link>"
 
 ==== Configure HTTP Accessible ks.cfg
 
-Install httpd
-Service Enable http
-Firewall add http
+We already took the time to install and configure the http service during the setup portion of this lab.  So now we just need to create an accessible kickstart config.
 
-----
-yum install -y httpd
-systemctl enable httpd
-systemctl start httpd
-
-firewall-cmd --add-service=http
-firewall-cmd --add-service=http --permanent
-----
-
-
-Create /var/www/html/ks.cfg
+Create the following file with the contents below: `/var/www/html/ks.cfg`
 
 ----
 lang en_US
@@ -333,6 +321,13 @@ wget
 %end
 ----
 
+Verify that the file and service are available
+
+----
+wget -q -O - http://localhost/ks.cfg
+----
+
+The results should match the file contents described above.  Now it's time to start building VMs.
 
 
 ==== virt-install to Install A System from ISO
