@@ -363,7 +363,7 @@ virt-install \
     --vcpus 4 \
     --ram 16000 \
     --disk bus=virtio,sparse=no,size=25 \
-    --extra-args "ks=${KS_URL} ${KS_NET}"
+    --extra-args "ks=${KS_URL} ${KS_NET}" \
     --name "vmachine-02" \
 ----
 
