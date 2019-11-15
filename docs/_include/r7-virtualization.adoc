@@ -338,6 +338,7 @@ In this example, we are creating a host called "ocp-bastion".  This set of argum
 ----
 export ISO_PATH="/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso"
 export KS_URL="http://rhv2.lab.linuxsoup.com/ks.cfg"
+export VM_NAME="bastion-host"
 
 virt-install \
     --console pty,target_type=virtio \
@@ -345,9 +346,9 @@ virt-install \
     --location ${ISO_PATH} \
     --vcpus 4 \
     --ram 16000 \
-    --disk bus=virtio,sparse=no,size=25 \
-    --name "vmachine-01" \ 
-    --extra-args "ks=${KS_URL}"
+    --disk /var/lib/libvirt/images/${VM_NAME},bus=virtio,sparse=no,size=25 \
+    --extra-args "ks=${KS_URL}" \
+    --name "${VM_NAME}"
 ----
 
 Here is a similar example except specifying the network parameters.
@@ -356,6 +357,7 @@ Here is a similar example except specifying the network parameters.
 export ISO_PATH="/var/lib/libvirt/images/rhel-8.1-x86_64-dvd.iso"
 export KS_URL="http://rhv2.lab.linuxsoup.com/ks.cfg"
 export KS_NET="ip=192.168.1.160 netmask=255.255.255.0 dns=192.168.1.30 gateway=192.168.1.1"
+export VM_NAME="bastion-host"
 
 virt-install \
     --console pty,target_type=virtio \
@@ -363,9 +365,9 @@ virt-install \
     --location ${ISO_PATH} \
     --vcpus 4 \
     --ram 16000 \
-    --disk bus=virtio,sparse=no,size=25 \
+    --disk /var/lib/libvirt/images/${VM_NAME},bus=virtio,sparse=no,size=25 \
     --extra-args "ks=${KS_URL} ${KS_NET}" \
-    --name "vmachine-02"
+    --name "VM_NAME"
 ----
 
 Some additional simple virtual machine management commands
