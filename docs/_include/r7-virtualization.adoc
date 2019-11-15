@@ -347,6 +347,7 @@ virt-install \
     --console pty,target_type=virtio \
     --graphics vnc \
     --location ${ISO_PATH} \
+    --vcpus 4 \
     --ram 16000 \
     --disk bus=virtio,sparse=no,size=25 \
     --name "vmachine-01" \ 
@@ -364,6 +365,7 @@ virt-install \
     --console pty,target_type=virtio \
     --graphics vnc \
     --location ${ISO_PATH} \
+    --vcpus 4 \
     --ram 16000 \
     --disk bus=virtio,sparse=no,size=25 \
     --extra-args "ks=${KS_URL} ${KS_NET}"
