@@ -318,6 +318,7 @@ redhat-lsb-core
 dhclient
 bind-utils
 wget
+git
 %end
 ----
 
