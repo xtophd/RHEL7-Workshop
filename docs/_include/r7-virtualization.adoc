@@ -261,6 +261,34 @@ virsh net-autostart host-bridge
 
 See reference doc: http://blog.leifmadsen.com/blog/2016/12/01/create-network-bridge-with-nmcli-for-libvirt/
 
+=== Extra command-line goodies
+
+==== Add Network to Existing VM
+
+----
+virsh attach-interface --domain ${VM_NAME} \ 
+    --source ${BRNAME} 
+    --type network \
+    --model virtio \
+    --mac 52:54:00:4b:73:5f \
+    --config \ 
+    --live
+----
+
+==== Add QCOW backed storage to VM
+
+----
+qemu-img create -f qcow2 /var/lib/libvirt/images/${VM_NAME}-extradisk 150G
+----
+
+----
+virsh attach-disk {vm-name} \
+--source /var/lib/libvirt/images/${VM_NAME}-extradisk \
+--target vdb \
+--subdriver qcow2 \
+--persistent
+----
+
 === Install VM from ISO
 
 ==== Fetch ISO from redhat.com
