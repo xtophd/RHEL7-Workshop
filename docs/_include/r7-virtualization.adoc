@@ -398,6 +398,20 @@ virt-install \
     --name "VM_NAME"
 ----
 
+Here is an example using a Satellite Discovery Image and specifying a predetermined mac address.
+
+----
+virt-install \
+    --name=ocp-bastion \
+    --file=/var/lib/libvirt/images/ocp-bastion.qcow2 \
+    --file-size=25 \
+    --nonsparse \
+    --ram=16000 \
+    --cdrom=/var/lib/libvirt/images/foreman-discovery-ExampleCom.iso  \
+    --graphics vnc \
+    --network "mac=52:54:00:39:40:b9"
+----
+
 Some additional simple virtual machine management commands
 
 ----
