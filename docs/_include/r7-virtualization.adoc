@@ -13,6 +13,8 @@ endif::[]
 :toc:
 :toclevels: 1
 
+NOTE: THE UNIT IS INCOMPELTE. PLEASE REFER THE TO THE RHEL 8 WORKSHOP.  THIS WILL UNIT WILL BE COMPLETED WHEN TIME PERMITS
+
 = Virtualization Management
 
 Provided your hardware is reasonably modern, chances are it supports virtualization.  This unit introduces simple virtualization management using kvm and libvirt.  You will learn how to:
