@@ -4,6 +4,10 @@ xtoph_config:
 
   cleanup: true
 
+  hostname: "{{ inventory_hostname }}"
+
+  clustername: "{{ xtoph_vars.clustername }}"
+
   selected_profile:
     kickstart: "{{ h_ksPROF | default ('') }}"
     resource:  "{{ h_rsPROF | default ('') }}"
@@ -26,7 +30,7 @@ xtoph_config:
     ##    accessible to the deployed VMs
     ##
 
-    ip: "192.168.127.1"
+    ip: "{{ xtoph_vars.deployhost_ip }}"
 
     ##
     ##    dnsmasq_enable:    ensures dnsmasq is installed
@@ -65,16 +69,16 @@ xtoph_config:
     ##    NOTE: needs to be unique for every host
     ##
 
-    tmp_dir: "/home/tmp/{{ g_clusterName }}/{{ inventory_hostname }}"
+    tmp_dir: "/home/tmp/{{ xtoph_vars.clustername }}/{{ inventory_hostname }}"
 
     ##
-    ##    Where with the kickstart configs are stored 
+    ##    Where with the kickstart configs are stored
     ##    What is the URL to access the kickstarts
     ##
 
     kickstart:
       dir: "/var/www/html/ks"
-      url: "http://192.168.127.1:8008/ks"
+      url: "http://{{ xtoph_vars.deployhost_ip }}:8008/ks"
 
     ##
     ##    Where will the repos be mounted
@@ -83,7 +87,7 @@ xtoph_config:
 
     repos:
       dir: "/var/www/html/repos"
-      url: "http://192.168.127.1:8008/repos"
+      url: "http://{{ xtoph_vars.deployhost_ip }}:8008/repos"
 
     ##
     ##    Where are the ISOs stored
@@ -91,3 +95,4 @@ xtoph_config:
 
     iso:
       dir: "/home/iso"
+
