@@ -1,7 +1,26 @@
 - hosts: all
   tasks:
+
+    ##
+    ##    Try loading the credentials.yml file
+    ##    if workshopuser_username is not defined
+    ##
+
+
+
+    - name: "rhel7-workshop : loading credentials"
+      include_vars:
+        file: "../config/credentials.yml"
+      when: workshopuser_username is undefined
+
+
+
+    ##
+    ##    Prepare the hosts for the rhel7 workshop
+    ##
+
   
-    - name: "TEMPLATE modify /etc/motd"
+    - name: "rhel7-workshop : modify /etc/motd"
       template:
         src: motd-generic.j2
         dest: /etc/motd
@@ -9,7 +28,7 @@
         group: root
         mode: 0644  
 
-    - name: "SERVICE disable and stop unwanted services"
+    - name: "rhel7-workshop : disable and stop unwanted services"
       service: 
         name="{{ item.name }}"
         state=stopped
@@ -17,19 +36,19 @@
       with_items:
         - {name: 'rhsmcertd'}
 
-    - name: "CMD disable yum plugins for subscription-manager"
+    - name: "rhel7-workshop : disable yum plugins for subscription-manager"
       shell: 
         cmd: |          
           sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/subscription-manager.conf
           sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/product-id.conf
                     
-    - name: "USER create and/or reset users"
-      user: name="{{ item.name }}" password="{{ item.password }}"
+    - name: "rhel7-workshop : create and/or reset users"
+      user: name="{{ item.name }}" password="{{ item.password | password_hash('sha512') }}"
       with_items:
-        - {name: 'root', password: '$6$9Jk5EGiB2aBl95kj$RIdiSqNdKt95zqddStFUY/zVKIUujWfGWJkLM5KQ.7zY88Kxxa0qm78qLMFRAqDO2qOrp.qZBaQAKcUFm1Is70'}
-        - {name: 'student', password: '$6$9Jk5EGiB2aBl95kj$RIdiSqNdKt95zqddStFUY/zVKIUujWfGWJkLM5KQ.7zY88Kxxa0qm78qLMFRAqDO2qOrp.qZBaQAKcUFm1Is70'}
+        - {name: '{{ workshopadmin_username }}', password: '{{ workshopadmin_password }}' }
+        - {name: '{{ workshopuser_username }}', password: '{{ workshopuser_password }}' }
 
-    - name: "Sudo Configuration"
+    - name: "rhel7-workshop : sudo Configuration"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"

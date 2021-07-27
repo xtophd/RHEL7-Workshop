@@ -1,11 +1,19 @@
 ---
-- hosts: node1.example.com
+- hosts: node1
   tasks:
 
-    - name: "SETUP ANSIBLE: install packages"
-      yum: name=ansible,rhel-system-roles state=installed
 
-    - name: "SETUP ANSIBLE: cheat script installs"
+    - name: "rhel7-setup-ansible : configure additional repos"
+      yum: name=https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm state=installed
+
+## The rhel-system-roles are not available on the ISO or from EPEL, so skip this for now.
+#    - name: "rhel7-setup-ansible : install ansible packages"
+#      yum: name=ansible,rhel-system-roles state=installed
+
+    - name: "rhel7-setup-ansible : install ansible packages"
+      yum: name=ansible state=installed
+
+    - name: "rhel7-setup-ansible : cheat script installs"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
