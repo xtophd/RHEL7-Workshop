@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: all,!myDeployhost
   tasks:
 
     ##
