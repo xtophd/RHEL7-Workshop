@@ -4,7 +4,7 @@
 ##     on the control host (ie: workstation)
 ##     CWD =  ~root/RHEL8-Workshop
 
-myInventory="./config/master-config.ini"
+myInventory="./config/master-config.yml"
 
 if [ ! -e "${myInventory}" ] ; then
     echo "ERROR: Are you in the right directory? Can not find ${myInventory}" ; exit
@@ -13,7 +13,7 @@ fi
     
 case "$1" in
     "all")
-        time  ansible-playbook -i ${myInventory} -f 10  ./playbooks/rhel8-workshop.yml
+        time  ansible-playbook --ask-vault-pass -i ${myInventory} -f 10  ./playbooks/rhel7-workshop.yml
         ;;
 
     "ansible"     | \
@@ -28,7 +28,7 @@ case "$1" in
     "virt"        | \
     "webconsole")
 
-        time  ansible-playbook -i ${myInventory} -f 10 --tags $1 ./playbooks/rhel8-workshop.yml
+        time  ansible-playbook --ask-vault-pass -i ${myInventory} -f 10 --tags $1 ./playbooks/rhel7-workshop.yml
         ;;
 
     *)

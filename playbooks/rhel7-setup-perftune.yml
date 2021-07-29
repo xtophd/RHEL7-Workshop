@@ -1,24 +1,24 @@
 ---
-- hosts: node1.example.com
+- hosts: node1
   handlers:
   
-    - name: "SETUP PERFTUNE (HANDLER): restart pmlogger"
+    - name: "rhel7-setup-perftune : (HANDLER) restart pmlogger"
       service: name=pmlogger state=restarted
       listen: "restart pmlogger"
       
   tasks:
 
-    - name: "SETUP PERFTUNE: install packages"
+    - name: "rhel7-setup-perftune : install packages"
       yum: name=pcp,pcp-gui,pcp-doc,numad,numactl state=installed
 
-    - name: "SETUP PERFTUNE: system service settings"
+    - name: "rhel7-setup-perftune : system service settings"
       service: name="{{ item.svc }}" state=started enabled=yes
       with_items:
         - {svc: pmcd}
         - {svc: pmlogger}
         - {svc: numad}
 
-    - name: "SETUP PERFTUNE: pmlogger config install"
+    - name: "rhel7-setup-perftune : pmlogger config install"
       template:
         src: "pmlogger-control.j2"
         dest: "/etc/pcp/pmlogger/control"
@@ -27,7 +27,7 @@
         mode: 0644
       notify: "restart pmlogger"
 
-    - name: "SETUP PERFTUNE: cheat script installs"
+    - name: "rhel7-setup-perftune : cheat script installs"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"

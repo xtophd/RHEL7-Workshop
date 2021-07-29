@@ -1,17 +1,17 @@
 ---
-- hosts: node1.example.com
+- hosts: node1
   tasks:
 
-    - name: "SETUP SYSTEMD: install packages"
+    - name: "rhel7-setup-systemd : install packages"
       yum: name=httpd,mariadb,mariadb-server,php,php-mysql state=installed
 
-    - name: "SETUP SYSTEMD: system service settings"
+    - name: "rhel7-setup-systemd : system service settings"
       service: name="{{ item.svc }}" state=stopped enabled=no
       with_items:
         - {svc: 'mariadb'}
         - {svc: 'httpd'}
 
-    - name: "SETUP SYSTEMD: cheat script installs"
+    - name: "rhel7-setup-systemd : cheat script installs"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"

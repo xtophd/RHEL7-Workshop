@@ -1,11 +1,11 @@
 ---
-- hosts: node1.example.com
+- hosts: node2
   tasks:
 
-    - name: "SETUP STORAGE: install packages"
+    - name: "rhel7-setup-storage : install packages"
       yum: name=system-storage-manager,kmod-kvdo,vdo state=installed        
 
-    - name: "SETUP STORAGE: identify disk"
+    - name: "rhel7-setup-storage : identify disk"
       shell: "if [ -e /dev/vdb ] ; then echo /dev/vdb; elif [ -e /dev/sdb ] ; then echo /dev/sdb ; else exit 1 ; fi"
       register: mydisk 
       
@@ -13,12 +13,12 @@
     #  debug:
     #    msg: "Disk is {{ mydisk.stdout }}"
 
-    - name: "SETUP STORAGE (checking disk status {{ mydisk.stdout }})"
+    - name: "rhel7-setup-storage : checking disk status {{ mydisk.stdout }})"
       shell: "if [ -e {{ mydisk.stdout }}1 ] ; then echo '** SKIP PARTITIONING ** MANUAL CLEANUP NEEDED **'; exit 1 ; fi"
       ignore_errors: True
       register: mydiskcheck
 
-    - name: "SETUP STORAGE: disk partitions and sync"
+    - name: "rhel7-setup-storage : disk partitions and sync"
       shell: 
         cmd: |
           # Create new partition table
@@ -32,7 +32,7 @@
       ignore_errors: True
       when: mydiskcheck.rc == 0
 
-    - name: "SETUP STORAGE: cheat script installs"
+    - name: "rhel7-setup-storage : cheat script installs"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
