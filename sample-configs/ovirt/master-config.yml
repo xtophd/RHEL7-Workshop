@@ -31,7 +31,21 @@ all:
       network_nameserver:  "192.168.1.30"
       network_timeserver:  "192.168.1.60"
       
-      studentName:         "cloud-user"
+      set_student_password: True
+      set_admin_password:   True
+
+      ##
+      ##    Passwords should be loaded from a file
+      ##    or be set in credentials.yml.  Never here
+      ##    unless you understand the risks.
+      ##
+      ##    !!! LEAVE PASSWORDS COMMENTED OUT !!!
+      ##
+
+      student_name:         "cloud-user"
+      #student_password:     ""
+      admin_name:           "root"
+      #admin_password:       ""
 
     ## ----------------------------------------
     ##    Xtoph Deploy Variables
@@ -41,52 +55,40 @@ all:
       deployhost_ip:       "192.168.1.170" 
       clustername:         "{{ workshop_vars.clustername }}"
 
-    ## ----------------------------------------
-    ##    Override default ansible host with
-    ##    one that includes fqdn.  This saves us
-    ##    from having to specify FQDN in host 
-    ##    vars section below.  This assumes all
-    ##    hosts are in the same domain. DUH!
-
-    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
-
 
 
 ## ----------------------------------------
 ## HOSTGROUPS & VARS
 ## ----------------------------------------
 
-
-
 myDeployhost:
   hosts:
     deployer:
       h_pubIP: "{{ xtoph_vars.deployhost_ip }}"
   vars:
+    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
     ansible_connection: local
 
 
 
 ## -----------------
 
-
-
 myBastion:
   hosts:
     bastion:
       h_pubIP: "192.168.1.130"
   vars:
-    h_hwPROF:  "ovirt_sda"
-    h_rsPROF:  "bastion"
-    h_ksPROF:  "rhel79-bootiso"
-    h_netDEV:  "eth0"
-    h_blkDEV:  "sda"
+    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
+    h_hwPROF:     "ovirt_sda"
+    h_rsPROF:     "bastion"
+    h_ksPROF:     "rhel79-bootiso"
+    h_plPROF:     "ovirt"
+    h_netDEV:     "eth0"
+    h_blkDEV:     "sda"
 
 
 
 ## -----------------
-
-
 
 myNodes:
   hosts:
@@ -103,7 +105,10 @@ myNodes:
       h_pubIP:  "192.168.1.134" 
       h_rsPROF: "tiny"
   vars: 
+    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
     h_hwPROF: "ovirt_sda"
+    h_plPROF: "ovirt"
     h_ksPROF: "rhel79-bootiso"
     h_netDEV: "eth0"
     h_blkDEV: "sda"
+
