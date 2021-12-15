@@ -41,35 +41,23 @@ all:
       deployhost_ip:       "192.168.126.1" 
       clustername:         "{{ workshop_vars.clustername }}"
 
-    ## ----------------------------------------
-    ##    Override default ansible host with
-    ##    one that includes fqdn.  This saves us
-    ##    from having to specify FQDN in host 
-    ##    vars section below.  This assumes all
-    ##    hosts are in the same domain. DUH!
-
-    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
-
 
 
 ## ----------------------------------------
 ## HOSTGROUPS & VARS
 ## ----------------------------------------
 
-
-
 myDeployhost:
   hosts:
-    gw126:
+    deployer:
       h_pubIP: "{{ xtoph_vars.deployhost_ip }}"
   vars:
+    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
     ansible_connection: local
 
 
 
 ## -----------------
-
-
 
 myBastion:
   hosts:
@@ -77,16 +65,17 @@ myBastion:
       h_pubIP: "192.168.126.110"
       h_rsPROF:  "bastion"
   vars:
+    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
     h_hwPROF:  "kvm_nest_vda"
+    h_plPROF:  "libvirt_nat"
     h_ksPROF:  "rhel79-bootiso"
     h_netDEV:  "eth0"
     h_blkDEV:  "vda"
 
 
 
+
 ## -----------------
-
-
 
 myNodes:
   hosts:
@@ -103,7 +92,10 @@ myNodes:
       h_pubIP:  "192.168.126.114" 
       h_rsPROF: "tiny"
   vars: 
-    h_hwPROF: "kvm_nest_vda"
-    h_ksPROF: "rhel79-bootiso"
-    h_netDEV: "eth0"
-    h_blkDEV: "vda"
+    ansible_host: "{{ inventory_hostname }}.{{ workshop_vars.network_fqdn }}"
+    h_hwPROF:  "kvm_nest_vda"
+    h_plPROF:  "libvirt_nat"
+    h_ksPROF:  "rhel79-bootiso"
+    h_netDEV:  "eth0"
+    h_blkDEV:  "vda"
+
