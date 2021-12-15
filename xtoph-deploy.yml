@@ -60,7 +60,7 @@
 
 
 ##
-##     For the RHEL 8 Workshop, there are 
+##     For the RHEL 7 Workshop, there are 
 ##     no concurrency issues, so proceed 
 ##     to deploy everything at once
 ##
@@ -95,9 +95,9 @@
 
 
 
-#- import_playbook: playbooks/rhel7-workshop.yml
-#  when: xtoph_deploy_cmd == "deploy" or 
-#        xtoph_deploy_cmd == "setup+" or 
-#        xtoph_deploy_cmd == "redeploy" or 
-#        xtoph_deploy_cmd == "workshop"
+- import_playbook: playbooks/rhel7-workshop.yml
+  when: xtoph_deploy_cmd == "deploy" or 
+        xtoph_deploy_cmd == "setup+" or 
+        xtoph_deploy_cmd == "redeploy" or 
+        xtoph_deploy_cmd == "workshop"
 

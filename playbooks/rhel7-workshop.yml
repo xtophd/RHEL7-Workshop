@@ -45,8 +45,8 @@
     - name: "rhel7-workshop : create and/or reset users"
       user: name="{{ item.name }}" password="{{ item.password | password_hash('sha512') }}"
       with_items:
-        - {name: '{{ workshopadmin_username }}', password: '{{ workshopadmin_password }}' }
-        - {name: '{{ workshopuser_username }}', password: '{{ workshopuser_password }}' }
+        - {name: '{{ workshop_vars.student_name }}', password: '{{ rhel7workshop_student_password }}' }
+        - {name: '{{ workshop_vars.admin_name }}', password: '{{ rhel7workshop_admin_password }}' }
 
     - name: "rhel7-workshop : sudo Configuration"
       template:

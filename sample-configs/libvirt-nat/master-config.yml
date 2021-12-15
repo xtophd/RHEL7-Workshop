@@ -30,8 +30,22 @@ all:
       network_gateway:     "192.168.126.1"
       network_nameserver:  "192.168.126.1"
       network_timeserver:  "192.168.126.1"
-      
-      studentName:         "cloud-user"
+
+      set_student_password: True
+      set_admin_password:   True
+
+      ##
+      ##    Passwords should be loaded from a file
+      ##    or be set in credentials.yml.  Never here
+      ##    unless you understand the risks.
+      ##
+      ##    !!! LEAVE PASSWORDS COMMENTED OUT !!!
+      ##
+
+      student_name:         "cloud-user"
+      #student_password:     ""
+      admin_name:           "root"
+      #admin_password:       ""
 
     ## ----------------------------------------
     ##    Xtoph Deploy Variables
@@ -46,6 +60,17 @@ all:
 ## ----------------------------------------
 ## HOSTGROUPS & VARS
 ## ----------------------------------------
+
+myLibvirtHosts:
+
+  hosts:
+    amanda1.lab.linuxsoup.com:
+      h_pubIP: "192.168.1.23"
+      ansible_connection: local
+
+
+
+## -----------------
 
 myDeployhost:
   hosts:
@@ -71,7 +96,6 @@ myBastion:
     h_ksPROF:  "rhel79-bootiso"
     h_netDEV:  "eth0"
     h_blkDEV:  "vda"
-
 
 
 
