@@ -142,7 +142,7 @@ Explore the metric list and see what else interests you and test it out with pmv
 
 === Overall System Performance: pmstat
 
-We can also review the overall system performance using pmstat command. The following command uses th epreviously identified log file ${MYPCPLOG} to display 7 statistic entries starting from 00:33:00.
+We can also review the overall system performance using pmstat command. The following command uses the previously identified log file ${MYPCPLOG} to display 7 statistic entries starting from 00:33:00.
 
 To test the same command, please change the date-stamped filename and start time accordingly
 
